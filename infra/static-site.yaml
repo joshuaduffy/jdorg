@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates an S3 Bucket configured for hosting a static website, and a Route
   53 DNS record pointing to the bucket
+
 Parameters:
   DomainName:
     Type: String
@@ -16,6 +17,7 @@ Parameters:
     Type: String
     Description: The Amazon Resource Name (ARN) of an AWS Certificate Manager (ACM) certificate.
     AllowedPattern: "arn:aws:acm:.*"
+
 Mappings:
   RegionMap:
     us-east-1:
@@ -34,6 +36,7 @@ Mappings:
       S3HostedZoneId: Z2M4EHUR26P7ZW
     sa-east-1:
       S3HostedZoneId: Z31GFT0UA1I2HV
+
 Resources:
   WebsiteBucket:
     Type: AWS::S3::Bucket
@@ -99,6 +102,7 @@ Resources:
         AliasTarget:
           HostedZoneId: Z2FDTNDATAQYW2
           DNSName: !GetAtt [WebsiteCloudfront, DomainName]
+
 Outputs:
   BucketName:
     Value: !Ref 'WebsiteBucket'

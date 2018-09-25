@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates Record Sets for Google Mail in Route 53
+
 Parameters:
   DomainName:
     Type: String

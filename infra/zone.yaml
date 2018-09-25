@@ -1,11 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates an Route 53 hosted zone
+
 Parameters:
   DomainName:
     Type: String
     Description: The DNS name of an Route 53 hosted zone e.g. joshuaduffy.org
     AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
     ConstraintDescription: Must be a valid DNS zone name.
+
 Resources:
   DNS:
     Type: AWS::Route53::HostedZone
