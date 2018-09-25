@@ -10,8 +10,8 @@ CLOUDFORMATION_TEMPLATE = path.join(HERE, 'infra', 'static-site.yaml')
 @task
 def clean(c):
     """Remove all build artifacts."""
-    c.run(
-        "docker run --rm -v {0}/:/jdorg alpine rm -rf /jdorg/build".format(JDORG))
+    c.run("docker run --rm -v {0}/:/jdorg alpine \
+        rm -rf /jdorg/build".format(JDORG))
 
 
 @task
