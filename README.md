@@ -11,22 +11,26 @@
 1. Create a new virtual environment via `pipenv --three`
 2. Install the dependencies via `pipenv install --dev`
 
-## Running the application
+Enter a shell session via `pipenv shell` to run `inv` commands (or prepend `pipenv run` to all subsequent `inv` commands).
 
-Firstly, enter a shell session via `pipenv shell` to run `invoke` commands.
+## List invoke commands
 
-Start the development server
+`inv --list`
+
+## Common commands
+
+Start the development server:
 
 `inv install start`
 
-Build and serve inside an nginx container
+Build and serve inside an nginx container:
 
 `inv clean install build up`
 
-Shut down the container and clean up
+Shut down the container and clean up:
 
 `inv down clean`
 
-Run the tests
+Run the tests:
 
 `inv install test`
