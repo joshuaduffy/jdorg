@@ -4,9 +4,9 @@ from invoke import task
 HERE = path.abspath(path.dirname(path.realpath(__file__)))
 INFRA = path.abspath(path.join(HERE, 'infra'))
 JDORG = path.abspath(path.join(HERE, 'jdorg'))
-ROUTE53_ZONE_TEMPLATE = path.join(HERE, 'infra', 'zone.yaml')
-ROUTE53_RECORDS_TEMPLATE = path.join(HERE, 'infra', 'mail.yaml')
-CLOUDFORMATION_TEMPLATE = path.join(HERE, 'infra', 'static-site.yaml')
+ROUTE53_ZONE_TEMPLATE = path.join(INFRA, 'zone.yaml')
+ROUTE53_RECORDS_TEMPLATE = path.join(INFRA, 'mail.yaml')
+CLOUDFORMATION_TEMPLATE = path.join(INFRA, 'static-site.yaml')
 
 
 @task
@@ -100,6 +100,10 @@ def __create_update_stack(c, domain_name, full_domain_name, acm_certificate_arn,
             ParameterKey=AcmCertificateArn,ParameterValue={4} \
         --profile {5}".format(action, CLOUDFORMATION_TEMPLATE, domain_name, full_domain_name, acm_certificate_arn, profile, stack_name))
 
+    c.run("aws cloudformation wait stack-{0}-complete \
+        --stack-name {2}-frontend \
+        --profile {1}".format(action, profile, stack_name))
+
 
 def __create_update_dns(c, domain_name, profile, create=True):
     action = 'create' if create else 'update'
@@ -111,6 +115,10 @@ def __create_update_dns(c, domain_name, profile, create=True):
         --parameters \
             ParameterKey=DomainName,ParameterValue={2} \
         --profile {3}".format(action, ROUTE53_ZONE_TEMPLATE, domain_name, profile, stack_name))
+    
+    c.run("aws cloudformation wait stack-{0}-complete \
+        --stack-name {2}-dns \
+        --profile {1}".format(action, profile, stack_name))
 
     c.run("aws cloudformation {0}-stack \
         --stack-name {4}-dns-mail \
@@ -118,3 +126,7 @@ def __create_update_dns(c, domain_name, profile, create=True):
         --parameters \
             ParameterKey=DomainName,ParameterValue={2} \
         --profile {3}".format(action, ROUTE53_RECORDS_TEMPLATE, domain_name, profile, stack_name))
+
+    c.run("aws cloudformation wait stack-{0}-complete \
+        --stack-name {2}-dns-mail \
+        --profile {1}".format(action, profile, stack_name))
