@@ -68,7 +68,6 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       Name: !Ref DomainName
-      SetIdentifier: google._domainkey
       HostedZoneName: !Join
         - ""
         - [!Ref DomainName, "."]
