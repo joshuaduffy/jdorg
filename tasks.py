@@ -2,18 +2,18 @@ from os import path, listdir
 from invoke import task
 
 HERE = path.abspath(path.dirname(path.realpath(__file__)))
-INFRA = path.abspath(path.join(HERE, 'infra'))
-JDORG = path.abspath(path.join(HERE, 'jdorg'))
-ROUTE53_ZONE_TEMPLATE = path.join(INFRA, 'zone.yaml')
-ROUTE53_RECORDS_TEMPLATE = path.join(INFRA, 'mail.yaml')
-CLOUDFORMATION_TEMPLATE = path.join(INFRA, 'static-site.yaml')
+INFRA_FOLDER = path.join(HERE, 'infra')
+JDORG_FOLDER = path.join(HERE, 'jdorg')
+ROUTE53_ZONE_TEMPLATE = path.join(INFRA_FOLDER, 'zone.yaml')
+ROUTE53_RECORDS_TEMPLATE = path.join(INFRA_FOLDER, 'mail.yaml')
+FRONTEND_TEMPLATE = path.join(INFRA_FOLDER, 'static-site.yaml')
 
 
 @task
 def clean(c):
     """Remove all build artifacts."""
     c.run("docker run --rm -v {0}/:/jdorg alpine \
-        rm -rf /jdorg/build".format(JDORG))
+        rm -rf /jdorg/build".format(JDORG_FOLDER))
 
 
 @task
@@ -35,7 +35,7 @@ def yolo_deploy(c, profile):
     c.run("cd {0} && aws s3 cp build s3://www.joshuaduffy.org/ \
         --recursive \
         --acl public-read \
-        --profile {1}".format(JDORG, profile))
+        --profile {1}".format(JDORG_FOLDER, profile))
 
 
 @task
@@ -65,10 +65,10 @@ def down(c):
 @task
 def validate_cf(c, profile):
     """Validate all CloudFormation templates."""
-    for filename in listdir(INFRA):
+    for filename in listdir(INFRA_FOLDER):
         c.run("aws cloudformation validate-template \
             --template-body file://{0} \
-            --profile {1}".format(path.join(INFRA, filename), profile))
+            --profile {1}".format(path.join(INFRA_FOLDER, filename), profile))
 
 
 @task
@@ -108,7 +108,7 @@ def __create_update_stack(c, domain_name, full_domain_name, acm_certificate_arn,
             ParameterKey=DomainName,ParameterValue={2} \
             ParameterKey=FullDomainName,ParameterValue={3} \
             ParameterKey=AcmCertificateArn,ParameterValue={4} \
-        --profile {5}".format(action, CLOUDFORMATION_TEMPLATE, domain_name, full_domain_name, acm_certificate_arn, profile, stack_name))
+        --profile {5}".format(action, FRONTEND_TEMPLATE, domain_name, full_domain_name, acm_certificate_arn, profile, stack_name))
 
 
 def __create_update_dns(c, domain_name, profile, create=True):
