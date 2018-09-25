@@ -67,7 +67,8 @@ Resources:
   TxtRecordSet:
     Type: AWS::Route53::RecordSet
     Properties:
-      Name: google_domainkey
+      Name: !Ref DomainName
+      SetIdentifier: google._domainkey
       HostedZoneName: !Join
         - ""
         - [!Ref DomainName, "."]
