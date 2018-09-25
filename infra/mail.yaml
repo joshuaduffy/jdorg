@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates Record Sets for Google Mail in Route 53
+Parameters:
+  DomainName:
+    Type: String
+    Description: The DNS name of an Route 53 hosted zone e.g. joshuaduffy.org
+    AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
+    ConstraintDescription: Must be a valid DNS zone name.
+  FirstMx:
+    Type: String
+    Default: ASPMX.L.GOOGLE.COM
+  SecondMx:
+    Type: String
+    Default: ALT1.ASPMX.L.GOOGLE.COM
+  ThirdMx:
+    Type: String
+    Default: ALT2.ASPMX.L.GOOGLE.COM
+  FourthMx:
+    Type: String
+    Default: ASPMX2.L.GOOGLE.COM
+  FifthMx:
+    Type: String
+    Default: ASPMX3.L.GOOGLE.COM
+  TTL:
+    Type: Number
+    Default: 3600
+
+Resources:
+  MxRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !Ref DomainName
+      HostedZoneName: !Join
+        - ""
+        - [!Ref DomainName, "."]
+      Type: MX
+      TTL: !Ref TTL
+      ResourceRecords:
+        - !Join
+          - ""
+          - [1, " ", !Ref FirstMx, "."]
+        - !Join
+          - ""
+          - [5, " ", !Ref SecondMx, "."]
+        - !Join
+          - ""
+          - [5, " ", !Ref ThirdMx, "."]
+        - !Join
+          - ""
+          - [10, " ", !Ref FourthMx, "."]
+        - !Join
+          - ""
+          - [10, " ", !Ref FifthMx, "."]
+  TxtRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: ""
+      HostedZoneName: !Join
+        - ""
+        - [!Ref DomainName, "."]
+      Type: TXT
+      TTL: !Ref TTL
+      ResourceRecords:
+        - "google-site-verification=mtidxOHUnvq8iuTzqSxLJ0UNOxnWR2fXa5GJcfcSAjo"
+        - "v=spf1 include:_spf.google.com ~all"
+  TxtRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: google_domainkey
+      HostedZoneName: !Join
+        - ""
+        - [!Ref DomainName, "."]
+      Type: TXT
+      TTL: !Ref TTL
+      ResourceRecords:
+        - "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCE3D4UpadZdsvTkj0hHHa7zGmI1gNUFQyxRlq2HHBvyReLb3vFdgOJY6D3rPjO7cNSQOGj5D/hnWvBGg4aztqVuDxwpIJR2A3h50R+IZZ7LyGtPNAGF5Sy8ldXbULRYs0LqHxWKFPm1f08lXaYhe51Io10mmMMy3jDuEXxNviFbQIDAQAB"
