@@ -12,6 +12,8 @@ name = "pypi"
 [dev-packages]
 
 invoke = "*"
+awscli = "*"
+"autopep8" = "*"
 
 
 [requires]
