@@ -29,6 +29,16 @@ def build(c):
 
 
 @task
+def yolo_deploy(c, profile):
+    """You Only Live Once. Deploy build to S3 Bucket."""
+    build(c)
+    c.run("cd {0} && aws s3 cp build s3://www.joshuaduffy.org/ \
+        --recursive \
+        --acl public-read \
+        --profile {1}".format(JDORG, profile))
+
+
+@task
 def start(c):
     """Start the application, in development mode."""
     c.run("cd jdorg && yarn start")
