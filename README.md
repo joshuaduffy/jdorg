@@ -9,7 +9,7 @@
 ## First step
 
 1. Create a new virtual environment via `pipenv --three`
-2. Install the dependancies via `pipenv install --dev`
+2. Install the dependencies via `pipenv install --dev`
 
 ## Running the application
 
