@@ -8,21 +8,25 @@
 
 ## First step
 
-`pipenv install --dev`
+1. Create a new virtual environment via `pipenv --three`
+2. Install the dependancies via `pipenv install --dev`
 
 ## Running the application
+
+Firstly, enter a shell session via `pipenv shell` to run `invoke` commands.
+
 Start the development server
 
-`pipenv run invoke install start`
+`inv install start`
 
 Build and serve inside an nginx container
 
-`pipenv run invoke clean install build up`
+`inv clean install build up`
 
 Shut down the container and clean up
 
-`pipenv run invoke down clean`
+`inv down clean`
 
 Run the tests
 
-`pipenv run invoke install test`
+`inv install test`

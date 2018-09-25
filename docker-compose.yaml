@@ -1,9 +1,10 @@
 version: '3'
+
 services:
   jdorg:
     image: nginx
     volumes:
-      - ./build:/usr/share/nginx/html
+      - "./jdorg/build:/usr/share/nginx/html"
     ports:
       - "8080:80"
     environment:
