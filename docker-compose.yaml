@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-  jdorg:
-    image: nginx
+  frontend:
+    image: nginx:1.14-alpine
     volumes:
       - "./jdorg/build:/usr/share/nginx/html"
     ports:
@@ -11,7 +11,17 @@ services:
       - NGINX_PORT=80
     networks:
       - jdorg
-
+  api:
+    image: python:alpine3.7
+    command: python /api/api.py
+    volumes:
+      - "./api:/api"
+    ports:
+      - "5000:5000"
+    environment:
+      - PROD=True
+    networks:
+      - jdorg
 networks:
   jdorg:
     driver: bridge
