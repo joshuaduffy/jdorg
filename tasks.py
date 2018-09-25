@@ -65,14 +65,14 @@ def validate_cf(c, profile):
 def create_frontend_cf(c, domain_name, full_domain_name, acm_certificate_arn, profile):
     """Create the frontend CloudFormation stack."""
     __create_update_stack(c, domain_name, full_domain_name,
-                         acm_certificate_arn, profile)
+                          acm_certificate_arn, profile)
 
 
 @task
 def update_frontend_cf(c, domain_name, full_domain_name, acm_certificate_arn, profile):
     """Update the frontend CloudFormation stack."""
     __create_update_stack(c, domain_name, full_domain_name,
-                         acm_certificate_arn, profile, create=False)
+                          acm_certificate_arn, profile, create=False)
 
 
 @task
@@ -89,30 +89,32 @@ def update_dns_cf(c, domain_name, profile):
 
 def __create_update_stack(c, domain_name, full_domain_name, acm_certificate_arn, profile, create=True):
     action = 'create' if create else 'update'
+    stack_name = domain_name.split('.')[0]
 
     c.run("aws cloudformation {0}-stack \
-        --stack-name {2} \
+        --stack-name {6}-frontend \
         --template-body file://{1} \
         --parameters \
             ParameterKey=DomainName,ParameterValue={2} \
             ParameterKey=FullDomainName,ParameterValue={3} \
             ParameterKey=AcmCertificateArn,ParameterValue={4} \
-        --profile {5}".format(action, CLOUDFORMATION_TEMPLATE, domain_name, full_domain_name, acm_certificate_arn, profile))
+        --profile {5}".format(action, CLOUDFORMATION_TEMPLATE, domain_name, full_domain_name, acm_certificate_arn, profile, stack_name))
 
 
 def __create_update_dns(c, domain_name, profile, create=True):
     action = 'create' if create else 'update'
+    stack_name = domain_name.split('.')[0]
 
     c.run("aws cloudformation {0}-stack \
-        --stack-name {2} \
+        --stack-name {4}-dns \
         --template-body file://{1} \
         --parameters \
             ParameterKey=DomainName,ParameterValue={2} \
-        --profile {3}".format(action, ROUTE53_ZONE_TEMPLATE, domain_name, profile))
+        --profile {3}".format(action, ROUTE53_ZONE_TEMPLATE, domain_name, profile, stack_name))
 
     c.run("aws cloudformation {0}-stack \
-        --stack-name {2} \
+        --stack-name {4}-dns-mail \
         --template-body file://{1} \
         --parameters \
             ParameterKey=DomainName,ParameterValue={2} \
-        --profile {3}".format(action, ROUTE53_RECORDS_TEMPLATE, domain_name, profile))
+        --profile {3}".format(action, ROUTE53_RECORDS_TEMPLATE, domain_name, profile, stack_name))
