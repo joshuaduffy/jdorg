@@ -89,9 +89,9 @@ Resources:
               Forward: none
           ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_All
-        ViewerCertificate:
-          AcmCertificateArn: !Ref AcmCertificateArn
-          SslSupportMethod: sni-only
+        # ViewerCertificate:
+        #   AcmCertificateArn: !Ref AcmCertificateArn
+        #   SslSupportMethod: sni-only
   WebsiteDNSName:
     Type: AWS::Route53::RecordSetGroup
     Properties:
