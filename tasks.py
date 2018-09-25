@@ -100,10 +100,6 @@ def __create_update_stack(c, domain_name, full_domain_name, acm_certificate_arn,
             ParameterKey=AcmCertificateArn,ParameterValue={4} \
         --profile {5}".format(action, CLOUDFORMATION_TEMPLATE, domain_name, full_domain_name, acm_certificate_arn, profile, stack_name))
 
-    c.run("aws cloudformation wait stack-{0}-complete \
-        --stack-name {2}-frontend \
-        --profile {1}".format(action, profile, stack_name))
-
 
 def __create_update_dns(c, domain_name, profile, create=True):
     action = 'create' if create else 'update'
@@ -126,7 +122,3 @@ def __create_update_dns(c, domain_name, profile, create=True):
         --parameters \
             ParameterKey=DomainName,ParameterValue={2} \
         --profile {3}".format(action, ROUTE53_RECORDS_TEMPLATE, domain_name, profile, stack_name))
-
-    c.run("aws cloudformation wait stack-{0}-complete \
-        --stack-name {2}-dns-mail \
-        --profile {1}".format(action, profile, stack_name))
