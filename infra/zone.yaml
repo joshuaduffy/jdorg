@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Creates an Route 53 hosted zone
+Description: Route 53 hosted zone
 
 Parameters:
   DomainName:
