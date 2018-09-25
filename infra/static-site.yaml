@@ -4,7 +4,7 @@ Description: Creates an S3 Bucket configured for hosting a static website, and a
 Parameters:
   DomainName:
     Type: String
-    Description: The DNS name of an existing Amazon Route 53 hosted zone e.g. joshuaduffy.org
+    Description: The DNS name of an existing Route 53 hosted zone e.g. joshuaduffy.org
     AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
     ConstraintDescription: Must be a valid DNS zone name.
   FullDomainName:
