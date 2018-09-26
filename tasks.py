@@ -125,6 +125,7 @@ def __create_update_dns(c, domain_name, profile, create=True):
         --profile {3}".format(action, ROUTE53_RECORDS_TEMPLATE, domain_name, profile, stack_name))
 
 def __build(c):
+    __clean(c)
     c.run("cd jdorg && yarn build")
 
 def __clean(c):
