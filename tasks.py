@@ -13,9 +13,10 @@ CLIENT_TEMPLATE = path.join(INFRA_FOLDER, 'static-site.yaml')
 
 @task
 def install(c):
-    """Install packages."""
+    """Install all packages."""
     c.run("cd jdorg && yarn install")
     c.run("pipenv install")
+    c.run("pipenv install --dev")
 
 
 @task
@@ -29,8 +30,9 @@ def yolo_deploy(c, profile):
 
 
 @task
-def start_client(c):
-    """Start the client, in development mode with hot reloading."""
+def client_dev(c):
+    """Start the API, then the client in development mode, with hot reloading."""
+    c.run("docker-compose -f {0}/docker-compose.yaml up -d api".format(HERE))
     c.run("cd jdorg && yarn start")
 
 
@@ -43,6 +45,7 @@ def test(c):
 @task
 def up(c):
     """Build and run the application."""
+    __build(c)
     c.run("pipenv lock -r > ./api/requirements.txt")
     c.run("docker-compose -f {0}/docker-compose.yaml up -d".format(HERE))
 
