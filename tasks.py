@@ -2,36 +2,26 @@ from os import path, listdir
 from invoke import task
 
 HERE = path.abspath(path.dirname(path.realpath(__file__)))
+
 INFRA_FOLDER = path.join(HERE, 'infra')
 JDORG_FOLDER = path.join(HERE, 'jdorg')
+
 ROUTE53_ZONE_TEMPLATE = path.join(INFRA_FOLDER, 'zone.yaml')
 ROUTE53_RECORDS_TEMPLATE = path.join(INFRA_FOLDER, 'mail.yaml')
-FRONTEND_TEMPLATE = path.join(INFRA_FOLDER, 'static-site.yaml')
-
-
-@task
-def clean(c):
-    """Remove all build artifacts."""
-    c.run("docker run --rm -v {0}/:/jdorg alpine \
-        rm -rf /jdorg/build".format(JDORG_FOLDER))
+CLIENT_TEMPLATE = path.join(INFRA_FOLDER, 'static-site.yaml')
 
 
 @task
 def install(c):
     """Install packages."""
     c.run("cd jdorg && yarn install")
-
-
-@task
-def build(c):
-    """Build the application."""
-    c.run("cd jdorg && yarn build")
+    c.run("pipenv install")
 
 
 @task
 def yolo_deploy(c, profile):
     """You Only Live Once. Deploy build to S3 Bucket."""
-    build(c)
+    __build(c)
     c.run("cd {0} && aws s3 cp build s3://www.joshuaduffy.org/ \
         --recursive \
         --acl public-read \
@@ -39,8 +29,8 @@ def yolo_deploy(c, profile):
 
 
 @task
-def start(c):
-    """Start the application, in development mode."""
+def start_client(c):
+    """Start the client, in development mode with hot reloading."""
     c.run("cd jdorg && yarn start")
 
 
@@ -53,7 +43,8 @@ def test(c):
 @task
 def up(c):
     """Build and run the application."""
-    c.run("docker-compose -f {0}/docker-compose.yaml up".format(HERE))
+    c.run("pipenv lock -r > ./api/requirements.txt")
+    c.run("docker-compose -f {0}/docker-compose.yaml up -d".format(HERE))
 
 
 @task
@@ -72,15 +63,15 @@ def validate_cf(c, profile):
 
 
 @task
-def create_frontend_cf(c, domain_name, full_domain_name, acm_certificate_arn, profile):
-    """Create the frontend CloudFormation stack."""
+def create_client_cf(c, domain_name, full_domain_name, acm_certificate_arn, profile):
+    """Create the client CloudFormation stack."""
     __create_update_stack(c, domain_name, full_domain_name,
                           acm_certificate_arn, profile)
 
 
 @task
-def update_frontend_cf(c, domain_name, full_domain_name, acm_certificate_arn, profile):
-    """Update the frontend CloudFormation stack."""
+def update_client_cf(c, domain_name, full_domain_name, acm_certificate_arn, profile):
+    """Update the client CloudFormation stack."""
     __create_update_stack(c, domain_name, full_domain_name,
                           acm_certificate_arn, profile, create=False)
 
@@ -102,13 +93,13 @@ def __create_update_stack(c, domain_name, full_domain_name, acm_certificate_arn,
     stack_name = domain_name.split('.')[0]
 
     c.run("aws cloudformation {0}-stack \
-        --stack-name {6}-frontend \
+        --stack-name {6}-client \
         --template-body file://{1} \
         --parameters \
             ParameterKey=DomainName,ParameterValue={2} \
             ParameterKey=FullDomainName,ParameterValue={3} \
             ParameterKey=AcmCertificateArn,ParameterValue={4} \
-        --profile {5}".format(action, FRONTEND_TEMPLATE, domain_name, full_domain_name, acm_certificate_arn, profile, stack_name))
+        --profile {5}".format(action, CLIENT_TEMPLATE, domain_name, full_domain_name, acm_certificate_arn, profile, stack_name))
 
 
 def __create_update_dns(c, domain_name, profile, create=True):
@@ -132,3 +123,11 @@ def __create_update_dns(c, domain_name, profile, create=True):
         --parameters \
             ParameterKey=DomainName,ParameterValue={2} \
         --profile {3}".format(action, ROUTE53_RECORDS_TEMPLATE, domain_name, profile, stack_name))
+
+def __build(c):
+    c.run("cd jdorg && yarn build")
+
+def __clean(c):
+    """Remove all build artifacts."""
+    c.run("docker run --rm -v {0}/:/jdorg alpine \
+        rm -rf /jdorg/build".format(JDORG_FOLDER))

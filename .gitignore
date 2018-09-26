@@ -22,3 +22,6 @@ yarn-error.log*
 
 # vscode
 .vscode
+
+# requirements.txt
+requirements.txt

@@ -3,6 +3,7 @@
 ## Requirements
 
 * `python`
+* `pipenv`
 * `node`
 * `yarn`
 

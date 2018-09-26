@@ -7,10 +7,10 @@ DEBUG = True if os.environ['PROD'] is not None else False
 app = Flask(__name__)
 api = Api(app)
 
-@api.route('/hello')
+@api.route('/')
 class HelloWorld(Resource):
     def get(self):
         return {'title': 'Welcome to React'}
 
 if __name__ == '__main__':
-    app.run(debug=DEBUG)
+    app.run(host='0.0.0.0', port=80, debug=DEBUG)
