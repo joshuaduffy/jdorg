@@ -1,7 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
+
 Description: Route 53 hosted zone
 
 Parameters:
+
   DomainName:
     Type: String
     Description: The DNS name of an Route 53 hosted zone e.g. joshuaduffy.org
@@ -9,6 +11,7 @@ Parameters:
     ConstraintDescription: Must be a valid DNS zone name.
 
 Resources:
+
   DNS:
     Type: AWS::Route53::HostedZone
     Properties:
@@ -18,3 +21,9 @@ Resources:
       HostedZoneTags:
       - Key: Application
         Value: jdorg
+
+Outputs:
+
+  DomainName:
+    Value: !Ref 'DomainName'
+    Description: DomainName

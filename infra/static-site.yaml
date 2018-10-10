@@ -1,24 +1,21 @@
 AWSTemplateFormatVersion: '2010-09-09'
+
 Description: S3 Bucket configured for hosting a static website, and a Route
   53 DNS record pointing to the bucket
 
 Parameters:
-  DomainName:
+
+  Subdomain:
     Type: String
-    Description: The DNS name of an existing Route 53 hosted zone e.g. joshuaduffy.org
-    AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
-    ConstraintDescription: Must be a valid DNS zone name.
-  FullDomainName:
-    Type: String
-    Description: The full domain name e.g. dev.joshuaduffy.org
-    AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
-    ConstraintDescription: Must be a valid DNS zone name.
+    Description: The subdomain to use e.g. dev, test, prod
+
   AcmCertificateArn:
     Type: String
     Description: The Amazon Resource Name (ARN) of an AWS Certificate Manager (ACM) certificate.
     AllowedPattern: "arn:aws:acm:.*"
 
 Mappings:
+
   RegionMap:
     us-east-1:
       S3HostedZoneId: Z3AQBSTGFYJSTF
@@ -38,15 +35,17 @@ Mappings:
       S3HostedZoneId: Z31GFT0UA1I2HV
 
 Resources:
+
   WebsiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref 'FullDomainName'
+      BucketName: !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: 404.html
     DeletionPolicy: Retain
+
   WebsiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -58,10 +57,9 @@ Resources:
           Principal: '*'
           Action: s3:GetObject
           Resource: !Join ['', ['arn:aws:s3:::', !Ref 'WebsiteBucket', /*]]
+
   WebsiteCloudfront:
     Type: AWS::CloudFront::Distribution
-    DependsOn:
-    - WebsiteBucket
     Properties:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 Bucket
@@ -69,14 +67,14 @@ Resources:
         - DomainName: !Select [2, !Split ["/", !GetAtt WebsiteBucket.WebsiteURL]]
           Id: S3Origin
           CustomOriginConfig:
-            HTTPPort: '80'
-            HTTPSPort: '443'
+            HTTPPort: 80
+            HTTPSPort: 443
             OriginProtocolPolicy: http-only
         Enabled: true
         HttpVersion: 'http2'
         DefaultRootObject: index.html
         Aliases:
-        - !Ref 'FullDomainName'
+        - !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
         DefaultCacheBehavior:
           AllowedMethods:
           - GET
@@ -92,24 +90,28 @@ Resources:
         # ViewerCertificate:
         #   AcmCertificateArn: !Ref AcmCertificateArn
         #   SslSupportMethod: sni-only
+
   WebsiteDNSName:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneName: !Join ['', [!Ref 'DomainName', .]]
+      HostedZoneName: !Join ['', [!ImportValue DomainName, .]]
       RecordSets:
-      - Name: !Ref 'FullDomainName'
+      - Name: !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
         Type: A
         AliasTarget:
           HostedZoneId: Z2FDTNDATAQYW2
           DNSName: !GetAtt [WebsiteCloudfront, DomainName]
 
 Outputs:
+
   BucketName:
     Value: !Ref 'WebsiteBucket'
     Description: Name of S3 Bucket to hold website content
+
   CloudfrontEndpoint:
     Value: !GetAtt [WebsiteCloudfront, DomainName]
     Description: Endpoint for Cloudfront distribution
+
   FullDomain:
-    Value: !Ref 'FullDomainName'
-    Description: Full DomainName
+    Value: !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
+    Description: FQDN
