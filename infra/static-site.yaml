@@ -9,11 +9,6 @@ Parameters:
     Type: String
     Description: The subdomain to use e.g. dev, test, prod
 
-  AcmCertificateArn:
-    Type: String
-    Description: The Amazon Resource Name (ARN) of an AWS Certificate Manager (ACM) certificate.
-    AllowedPattern: "arn:aws:acm:.*"
-
 Mappings:
 
   RegionMap:
@@ -87,9 +82,9 @@ Resources:
               Forward: none
           ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_All
-        # ViewerCertificate:
-        #   AcmCertificateArn: !Ref AcmCertificateArn
-        #   SslSupportMethod: sni-only
+        ViewerCertificate:
+          AcmCertificateArn: !ImportValue AcmCertificateArn
+          SslSupportMethod: sni-only
 
   WebsiteDNSName:
     Type: AWS::Route53::RecordSetGroup

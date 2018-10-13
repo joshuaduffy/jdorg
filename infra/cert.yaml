@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: SSL/TLS Certificate
+
+Resources:
+
+  BaseDomainWildcardCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Join [".", ["*", !ImportValue DomainName]]
+      ValidationMethod: DNS
+
+Outputs:
+
+  BaseDomainWildcardCertificate:
+    Description: ARN of the Certificate
+    Value: !Ref BaseDomainWildcardCertificate
+    Export:
+      Name: AcmCertificateArn
