@@ -8,6 +8,7 @@ JDORG_FOLDER = path.join(HERE, 'jdorg')
 
 ROUTE53_ZONE_TEMPLATE = path.join(INFRA_FOLDER, 'zone.yaml')
 ROUTE53_RECORDS_TEMPLATE = path.join(INFRA_FOLDER, 'mail.yaml')
+CERT_TEMPLATE = path.join(INFRA_FOLDER, 'cert.yaml')
 CLIENT_TEMPLATE = path.join(INFRA_FOLDER, 'static-site.yaml')
 
 
@@ -34,6 +35,13 @@ def client_dev(c):
     """Start the API, then the client in development mode, with hot reloading."""
     c.run("docker-compose -f {0}/docker-compose.yaml up -d api".format(HERE))
     c.run("cd jdorg && yarn start")
+
+
+@task
+def api_dev(c):
+    """Start the client, then the API in debug mode."""
+    c.run("docker-compose -f {0}/docker-compose.yaml up -d client".format(HERE))
+    c.run("cd api && python main.py")
 
 
 @task
@@ -66,70 +74,70 @@ def validate_cf(c, profile):
 
 
 @task
-def create_client_cf(c, domain_name, full_domain_name, acm_certificate_arn, profile):
+def create_client_cf(c, stack_name, subdomain, acm_certificate_arn, profile):
     """Create the client CloudFormation stack."""
-    __create_update_stack(c, domain_name, full_domain_name,
+    __create_update_stack(c, stack_name, subdomain,
                           acm_certificate_arn, profile)
 
 
 @task
-def update_client_cf(c, domain_name, full_domain_name, acm_certificate_arn, profile):
+def update_client_cf(c, stack_name, subdomain, profile):
     """Update the client CloudFormation stack."""
-    __create_update_stack(c, domain_name, full_domain_name,
-                          acm_certificate_arn, profile, create=False)
+    __create_update_stack(c, stack_name, subdomain, profile, create=False)
 
 
 @task
-def create_dns_cf(c, domain_name, profile):
-    """Create the DNS CloudFormation stack."""
-    __create_update_dns(c, domain_name, profile)
+def create_dns_cf(c, stack_name, domain_name, profile):
+    """Create the DNS CloudFormation stack, along with cert."""
+    __create_update_dns_and_cert(c, stack_name, domain_name, profile)
 
 
 @task
-def update_dns_cf(c, domain_name, profile):
-    """Update the DNS CloudFormation stack."""
-    __create_update_dns(c, domain_name, profile, create=False)
+def update_dns_cf(c, stack_name, domain_name, profile):
+    """Update the DNS CloudFormation stack, along with cert."""
+    __create_update_dns_and_cert(c, stack_name, domain_name, profile, create=False)
 
 
-def __create_update_stack(c, domain_name, full_domain_name, acm_certificate_arn, profile, create=True):
+def __create_update_stack(c, stack_name, subdomain, profile, create=True):
     action = 'create' if create else 'update'
-    stack_name = domain_name.split('.')[0]
 
     c.run("aws cloudformation {0}-stack \
-        --stack-name {6}-client \
-        --template-body file://{1} \
+        --stack-name {1}-client \
+        --template-body file://{2} \
         --parameters \
-            ParameterKey=DomainName,ParameterValue={2} \
-            ParameterKey=FullDomainName,ParameterValue={3} \
-            ParameterKey=AcmCertificateArn,ParameterValue={4} \
-        --profile {5}".format(action, CLIENT_TEMPLATE, domain_name, full_domain_name, acm_certificate_arn, profile, stack_name))
+            ParameterKey=Subdomain,ParameterValue={3} \
+        --profile {4}".format(action, stack_name, CLIENT_TEMPLATE, subdomain, profile))
 
 
-def __create_update_dns(c, domain_name, profile, create=True):
+def __create_update_dns_and_cert(c, stack_name, domain_name, profile, create=True):
     action = 'create' if create else 'update'
-    stack_name = domain_name.split('.')[0]
 
     c.run("aws cloudformation {0}-stack \
-        --stack-name {4}-dns \
-        --template-body file://{1} \
+        --stack-name {1}-dns \
+        --template-body file://{2} \
         --parameters \
-            ParameterKey=DomainName,ParameterValue={2} \
-        --profile {3}".format(action, ROUTE53_ZONE_TEMPLATE, domain_name, profile, stack_name))
+            ParameterKey=DomainName,ParameterValue={3} \
+        --profile {4}".format(action, stack_name, ROUTE53_ZONE_TEMPLATE, domain_name, profile))
     
     c.run("aws cloudformation wait stack-{0}-complete \
-        --stack-name {2}-dns \
-        --profile {1}".format(action, profile, stack_name))
+        --stack-name {1}-dns \
+        --profile {2}".format(action, stack_name, profile))
 
     c.run("aws cloudformation {0}-stack \
-        --stack-name {4}-dns-mail \
-        --template-body file://{1} \
-        --parameters \
-            ParameterKey=DomainName,ParameterValue={2} \
-        --profile {3}".format(action, ROUTE53_RECORDS_TEMPLATE, domain_name, profile, stack_name))
+        --stack-name {1}-dns-mail \
+        --template-body file://{2} \
+        --profile {3}".format(action, stack_name, ROUTE53_RECORDS_TEMPLATE, profile))
+
+    c.run("aws cloudformation {0}-stack \
+        --stack-name {1}-cert \
+        --template-body file://{2} \
+        --profile {3}".format(action, stack_name, CERT_TEMPLATE, profile))
+
 
 def __build(c):
     __clean(c)
     c.run("cd jdorg && yarn build")
+
 
 def __clean(c):
     """Remove all build artifacts."""
