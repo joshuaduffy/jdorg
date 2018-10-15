@@ -56,6 +56,6 @@ Resources:
       Type: TXT
       TTL: !Ref TTL
       ResourceRecords:
-        - !Join [" ", ["v=DKIM1;", "k=rsa;", "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCE3D4UpadZdsvTkj0hHHa7zGmI1gNUFQyxRlq2HHBvyReLb3vFdgOJY6D3rPjO7cNSQOGj5D/hnWvBGg4aztqVuDxwpIJR2A3h50R+IZZ7LyGtPNAGF5Sy8ldXbULRYs0LqHxWKFPm1f08lXaYhe51Io10mmMMy3jDuEXxNviFbQIDAQAB" ]]
+        - !Join [" ", ["\"", "v=DKIM1;", "k=rsa;", "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCE3D4UpadZdsvTkj0hHHa7zGmI1gNUFQyxRlq2HHBvyReLb3vFdgOJY6D3rPjO7cNSQOGj5D/hnWvBGg4aztqVuDxwpIJR2A3h50R+IZZ7LyGtPNAGF5Sy8ldXbULRYs0LqHxWKFPm1f08lXaYhe51Io10mmMMy3jDuEXxNviFbQIDAQAB", "\""]]
         - !Join ["", ["google-site-verification=mtidxOHUnvq8iuTzqSxLJ0UNOxnWR2fXa5GJcfcSAjo", ""]]
-        - !Join ["", ["v=spf1 include:_spf.google.com ~all",""]]
+        - !Join ["", ["\"", "v=spf1 include:_spf.google.com ~all","\""]]
