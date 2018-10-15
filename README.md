@@ -20,17 +20,17 @@ Enter a shell session via `pipenv shell` to run `inv` commands (or prepend `pipe
 
 ## Common commands
 
-Start the development server:
+Client development:
 
-`inv install start`
+`inv install client-dev`
+
+API development:
+
+`inv install api-dev`
 
 Build and serve inside an nginx container:
 
-`inv clean install build up`
-
-Shut down the container and clean up:
-
-`inv down clean`
+`inv install up`
 
 Run the tests:
 

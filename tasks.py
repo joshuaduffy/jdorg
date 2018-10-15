@@ -21,16 +21,6 @@ def install(c):
 
 
 @task
-def yolo_deploy(c, profile):
-    """You Only Live Once. Deploy build to S3 Bucket."""
-    __build(c)
-    c.run("cd {0} && aws s3 cp build s3://www.joshuaduffy.org/ \
-        --recursive \
-        --acl public-read \
-        --profile {1}".format(JDORG_FOLDER, profile))
-
-
-@task
 def client_dev(c):
     """Start the API, then the client in development mode, with hot reloading."""
     c.run("docker-compose -f {0}/docker-compose.yaml up -d api".format(HERE))
@@ -39,15 +29,9 @@ def client_dev(c):
 
 @task
 def api_dev(c):
-    """Start the client, then the API in debug mode."""
+    """Start the client, then the API in development mode, with hot reloading."""
     c.run("docker-compose -f {0}/docker-compose.yaml up -d client".format(HERE))
     c.run("cd api && python main.py")
-
-
-@task
-def test(c):
-    """Run the tests."""
-    c.run("cd jdorg && yarn test")
 
 
 @task
@@ -62,6 +46,12 @@ def up(c):
 def down(c):
     """Teardown the application."""
     c.run("docker-compose -f {0}/docker-compose.yaml down".format(HERE))
+
+
+@task
+def test(c):
+    """Run all the tests."""
+    c.run("cd jdorg && yarn test")
 
 
 @task
@@ -118,7 +108,7 @@ def __create_update_dns_and_cert(c, stack_name, domain_name, profile, create=Tru
         --parameters \
             ParameterKey=DomainName,ParameterValue={3} \
         --profile {4}".format(action, stack_name, ROUTE53_ZONE_TEMPLATE, domain_name, profile))
-    
+
     c.run("aws cloudformation wait stack-{0}-complete \
         --stack-name {1}-dns \
         --profile {2}".format(action, stack_name, profile))
@@ -135,11 +125,4 @@ def __create_update_dns_and_cert(c, stack_name, domain_name, profile, create=Tru
 
 
 def __build(c):
-    __clean(c)
     c.run("cd jdorg && yarn build")
-
-
-def __clean(c):
-    """Remove all build artifacts."""
-    c.run("docker run --rm -v {0}/:/jdorg alpine \
-        rm -rf /jdorg/build".format(JDORG_FOLDER))
