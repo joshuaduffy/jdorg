@@ -8,25 +8,10 @@ Parameters:
     Type: String
     Description: The subdomain to use e.g. dev, test, prod
 
-Mappings:
+Conditions:
 
-  RegionMap:
-    us-east-1:
-      S3HostedZoneId: Z3AQBSTGFYJSTF
-    us-west-1:
-      S3HostedZoneId: Z2F56UZL2M1ACD
-    us-west-2:
-      S3HostedZoneId: Z3BJ6K6RIION7M
-    eu-west-1:
-      S3HostedZoneId: Z1BKCTXD74EZPE
-    ap-southeast-1:
-      S3HostedZoneId: Z3O0J2DXBE1FTB
-    ap-southeast-2:
-      S3HostedZoneId: Z1WCIGYICN2BYD
-    ap-northeast-1:
-      S3HostedZoneId: Z2M4EHUR26P7ZW
-    sa-east-1:
-      S3HostedZoneId: Z31GFT0UA1I2HV
+  HttpsEnabled: !Not [!Equals [ !ImportValue AcmCertificateArn, "AWS::NoValue" ]]
+  HttpsDisabled: !Equals [ !ImportValue AcmCertificateArn, "AWS::NoValue" ]
 
 Resources:
 
@@ -52,8 +37,9 @@ Resources:
           Action: s3:GetObject
           Resource: !Join ['', ['arn:aws:s3:::', !Ref 'WebsiteBucket', /*]]
 
-  WebsiteCloudFront:
+  WebsiteWithHttpsCloudFront:
     Type: AWS::CloudFront::Distribution
+    Condition: HttpsEnabled
     Properties:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 Bucket
@@ -85,8 +71,9 @@ Resources:
           AcmCertificateArn: !ImportValue AcmCertificateArn
           SslSupportMethod: sni-only
 
-  WebsiteDNSName:
+  WebsiteWithHttpsDNSName:
     Type: AWS::Route53::RecordSetGroup
+    Condition: HttpsEnabled
     Properties:
       HostedZoneName: !Join ['', [!ImportValue DomainName, .]]
       RecordSets:
@@ -94,7 +81,57 @@ Resources:
         Type: A
         AliasTarget:
           HostedZoneId: Z2FDTNDATAQYW2
-          DNSName: !GetAtt [WebsiteCloudFront, DomainName]
+          DNSName: !GetAtt [WebsiteWithHttpsCloudFront, DomainName]
+
+  WebsiteWithoutHttpsCloudFront:
+    Type: AWS::CloudFront::Distribution
+    Condition: HttpsDisabled
+    Properties:
+      DistributionConfig:
+        Comment: Cloudfront Distribution pointing to S3 Bucket
+        Origins:
+        - DomainName: !Select [2, !Split ["/", !GetAtt WebsiteBucket.WebsiteURL]]
+          Id: S3Origin
+          CustomOriginConfig:
+            HTTPPort: 80
+            HTTPSPort: 443
+            OriginProtocolPolicy: http-only
+        Enabled: true
+        HttpVersion: 'http2'
+        DefaultRootObject: index.html
+        Aliases:
+        - !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          Compress: true
+          TargetOriginId: S3Origin
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          AcmCertificateArn: !ImportValue AcmCertificateArn
+          SslSupportMethod: sni-only
+
+  WebsiteWithoutHttpsDNSName:
+    Type: AWS::Route53::RecordSetGroup
+    Condition: HttpsDisabled
+    Properties:
+      HostedZoneName: !Join ['', [!ImportValue DomainName, .]]
+      RecordSets:
+      - Name: !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
+        Type: A
+        AliasTarget:
+          HostedZoneId: Z2FDTNDATAQYW2
+          DNSName: !GetAtt [WebsiteWithoutHttpsCloudFront, DomainName]
+
+
+
+
 
 Outputs:
 
@@ -104,8 +141,16 @@ Outputs:
     Export:
       Name: BucketName
 
-  CloudFrontEndpoint:
-    Value: !GetAtt [WebsiteCloudFront, DomainName]
+  WebsiteWithHttpsCloudFrontEndpoint:
+    Condition: HttpsEnabled
+    Value: !GetAtt [WebsiteWithHttpsCloudFront, DomainName]
+    Description: CloudFront distribution endpoint
+    Export:
+      Name: CloudFrontEndpoint
+
+  WebsiteWithoutHttpsCloudFrontEndpoint:
+    Condition: HttpsDisabled
+    Value: !GetAtt [WebsiteWithoutHttpsCloudFront, DomainName]
     Description: CloudFront distribution endpoint
     Export:
       Name: CloudFrontEndpoint
