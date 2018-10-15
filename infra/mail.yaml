@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: Route 53 Record Sets for Google Mail
+Description: Route53 Record Sets for Google Mail
 
 Parameters:
 

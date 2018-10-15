@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: S3 Bucket configured for hosting a static website, and a Route
-  53 DNS record pointing to the bucket
+Description: S3 Bucket configured for hosting a static website, and a Route53 DNS record pointing at the bucket
 
 Parameters:
 
@@ -102,11 +101,17 @@ Outputs:
   BucketName:
     Value: !Ref 'WebsiteBucket'
     Description: S3 Bucket Name
+    Export:
+      Name: BucketName
 
   CloudFrontEndpoint:
     Value: !GetAtt [WebsiteCloudFront, DomainName]
     Description: CloudFront distribution endpoint
+    Export:
+      Name: CloudFrontEndpoint
 
   FullDomain:
     Value: !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
     Description: FQDN
+    Export:
+      Name: FullDomain

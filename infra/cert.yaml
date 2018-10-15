@@ -4,7 +4,7 @@ Description: SSL/TLS Certificate
 
 Resources:
 
-  BaseDomainWildcardCertificate:
+  WebsiteWildcardCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Join [".", ["*", !ImportValue DomainName]]
@@ -12,8 +12,8 @@ Resources:
 
 Outputs:
 
-  BaseDomainWildcardCertificate:
+  AcmCertificateArn:
     Description: ARN of the Certificate
-    Value: !Ref BaseDomainWildcardCertificate
+    Value: !Ref WebsiteWildcardCertificate
     Export:
       Name: AcmCertificateArn

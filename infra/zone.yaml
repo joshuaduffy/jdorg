@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: Route 53 hosted zone
+Description: Route53 hosted zone
 
 Parameters:
 
@@ -27,3 +27,5 @@ Outputs:
   DomainName:
     Value: !Ref 'DomainName'
     Description: DomainName
+    Export:
+      Name: DomainName
