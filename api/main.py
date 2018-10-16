@@ -1,7 +1,7 @@
 import json
 import os
 from flask import Flask
-from flask_restplus import Api, cors, fields, marshal, Resource
+from flask_restplus import Api, cors, Resource
 
 DEBUG = True if os.environ['PROD'] is not None else False
 
