@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: SSL/TLS Certificate
+Description: Wildcard SSL/TLS certificate
 
 Resources:
 
