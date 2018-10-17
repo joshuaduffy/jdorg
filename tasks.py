@@ -63,10 +63,17 @@ def deploy(c, profile):
         --delete \
         --cache-control no-cache,no-store,must-revalidate \
         --profile {1}".format(JDORG_FOLDER, profile))
+
     c.run("aws s3 cp s3://www.joshuaduffy.org/static s3://www.joshuaduffy.org/static \
         --recursive \
         --metadata-directive REPLACE \
         --cache-control public,max-age=31536000 \
+        --profile {0}".format(profile))
+
+    c.run("aws s3 cp s3://www.joshuaduffy.org/service-worker.js s3://www.joshuaduffy.org/service-worker.js \
+        --metadata-directive REPLACE \
+        --cache-control no-cache,no-store,must-revalidate \
+        --content-type application/javascript \
         --profile {0}".format(profile))
 
 
