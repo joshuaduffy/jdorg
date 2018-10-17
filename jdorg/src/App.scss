@@ -1,3 +1,7 @@
+@import 'styles/Fade.scss';
+
+$screen-size: 600px;
+
 .flex-container {
   height: 100%;
   margin: 5rem;
@@ -8,6 +12,9 @@
   display: flex;
   align-items: center;
   flex-direction: column;
+  @media only screen and (max-width: $screen-size) {
+    margin: 1rem;
+  }
 }
 
 .image {
@@ -18,47 +25,16 @@
 .title {
   font-family: 'Aladin', cursive;
   font-size: 5rem;
-}
-
-@media only screen and (max-width: 600px) {
-  .flex-container {
-    margin: 1rem;
-  }
-
-  .title {
+  @media only screen and (max-width: $screen-size) {
     font-size: 3rem;
   }
 }
 
 #fade-in {
-  -webkit-animation: fadein 2.5s;
-  -moz-animation: fadein 2.5s;
-  -ms-animation: fadein 2.5s;
-  -o-animation: fadein 2.5s;
-  animation: fadein 2.5s;
+  @include animation('fadein 2.5s');
 }
 
-@keyframes fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@-moz-keyframes fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@-webkit-keyframes fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@-ms-keyframes fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@-o-keyframes fadein {
+@include keyframes(fadein) {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
