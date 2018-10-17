@@ -6,8 +6,8 @@ import './App.css';
 const app = () => {
   return (
     <div className="flex-container">
-      <img className="image" src={fistSvg} alt="fist" />
-      <span className="title">JD</span>
+      <img id="fade-in" className="image" src={fistSvg} alt="fist" />
+      <span id="fade-in" className="title">JD</span>
     </div>
   );
 };
