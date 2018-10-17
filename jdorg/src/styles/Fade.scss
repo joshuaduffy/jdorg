@@ -3,29 +3,33 @@
   $animations: '';
 
   @for $i from 1 through $max {
-      $animations: #{$animations + nth($animate, $i)};
+    $animations: #{$animations + nth($animate, $i)};
 
-      @if $i < $max {
-          $animations: #{$animations + ", "};
-      }
+    @if $i < $max {
+      $animations: #{$animations + ", "};
+    }
   }
   -webkit-animation: $animations;
   -moz-animation:    $animations;
   -o-animation:      $animations;
+  -ms-animation:     $animations;
   animation:         $animations;
 }
 
 @mixin keyframes($animationName) {
   @-webkit-keyframes #{$animationName} {
-      @content;
+    @content;
   }
   @-moz-keyframes #{$animationName} {
-      @content;
+    @content;
   }
   @-o-keyframes #{$animationName} {
-      @content;
+    @content;
+  }
+  @-ms-keyframes #{$animationName} {
+  @content;
   }
   @keyframes #{$animationName} {
-      @content;
+    @content;
   }
 }
