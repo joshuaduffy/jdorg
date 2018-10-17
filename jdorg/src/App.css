@@ -1,22 +1,44 @@
 .flex-container {
-    height: 100%;
-    margin: 1rem;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+  height: 100%;
+  margin: 5rem;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .image {
-    max-width:100%;
-    max-height:100%;
+  max-width:100%;
+  max-height:100%;
 }
 
 .title {
+  font-family: 'Aladin', cursive;
+  font-size: 4rem;
+}
+
+@media only screen and (max-width: 800) {
+  .flex-container {
+    margin: 2rem;
+  }
+
+  .title {
     font-family: 'Aladin', cursive;
-    font-size: 4rem
+    font-size: 3rem;
+  }
+}
+
+@media only screen and (max-width: 450) {
+  .flex-container {
+    margin: 1rem;
+  }
+
+  .title {
+    font-family: 'Aladin', cursive;
+    font-size: 2rem;
+  }
 }
