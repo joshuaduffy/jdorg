@@ -10,6 +10,7 @@ ROUTE53_ZONE_TEMPLATE = path.join(INFRA_FOLDER, 'zone.yaml')
 ROUTE53_RECORDS_TEMPLATE = path.join(INFRA_FOLDER, 'mail.yaml')
 CERT_TEMPLATE = path.join(INFRA_FOLDER, 'cert.yaml')
 CLIENT_TEMPLATE = path.join(INFRA_FOLDER, 'static-site.yaml')
+TLD_TEMPLATE = path.join(INFRA_FOLDER, 'top-level-domain.yaml')
 
 
 @task
@@ -114,6 +115,18 @@ def update_cert_cf(c, stack_name, domain_name, profile):
     __create_update_cert(c, stack_name, domain_name, profile, create=False)
 
 
+@task
+def create_tld_cf(c, stack_name, dns_name, profile):
+    """Create the SSL/TLS certificate CloudFormation stack."""
+    __create_update_tld(c, stack_name, dns_name, profile)
+
+
+@task
+def update_tld_cf(c, stack_name, dns_name, profile):
+    """Update the SSL/TLS certificate CloudFormation stack."""
+    __create_update_tld(c, stack_name, dns_name, profile, create=False)
+
+
 def __create_update_stack(c, stack_name, subdomain, profile, cert_arn, create=True):
     action = 'create' if create else 'update'
 
@@ -164,6 +177,17 @@ def __create_update_cert(c, stack_name, domain_name, profile, create=True):
             ParameterKey=DomainName,ParameterValue={3} \
         --profile {4} \
         --region us-east-1".format(action, stack_name, CERT_TEMPLATE, domain_name, profile))
+
+
+def __create_update_tld(c, stack_name, dns_name, profile, create=True):
+    action = 'create' if create else 'update'
+
+    c.run("aws cloudformation {0}-stack \
+        --stack-name {1}-dns-tld \
+        --template-body file://{2} \
+        --parameters \
+            ParameterKey=DNSName,ParameterValue={3} \
+        --profile {4}".format(action, stack_name, TLD_TEMPLATE, dns_name, profile))
 
 
 def __build(c):

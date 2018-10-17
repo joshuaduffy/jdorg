@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Route53 record for TLD
+
+Parameters:
+
+  DNSName:
+    Type: String
+    Default: DNS Name to alias to the Top Level Domain Name
+
+Resources:
+
+  WebsiteTopLevelDomainDNS:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: !Join ['', [!ImportValue DomainName, .]]
+      RecordSets:
+      - Name: !Join ['', [!ImportValue DomainName, .]]
+        Type: A
+        AliasTarget:
+          HostedZoneId: Z2FDTNDATAQYW2
+          DNSName: !Ref DNSName
