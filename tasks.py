@@ -124,13 +124,13 @@ def update_cert_cf(c, stack_name, domain_name, profile):
 
 @task
 def create_tld_cf(c, stack_name, dns_name, profile):
-    """Create the SSL/TLS certificate CloudFormation stack."""
+    """Create the TLD CloudFormation stack."""
     __create_update_tld(c, stack_name, dns_name, profile)
 
 
 @task
 def update_tld_cf(c, stack_name, dns_name, profile):
-    """Update the SSL/TLS certificate CloudFormation stack."""
+    """Update the TLD CloudFormation stack."""
     __create_update_tld(c, stack_name, dns_name, profile, create=False)
 
 
