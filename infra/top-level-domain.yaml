@@ -8,15 +8,148 @@ Parameters:
     Type: String
     Default: DNS Name to alias to the Top Level Domain Name
 
+  CertificateArn:
+    Type: String
+    Description: ARN of the certificate in ACM
+
+Conditions:
+
+  HttpsEnabled: !Not [!Equals [!Ref CertificateArn, ""]]
+  HttpsDisabled: !Equals [!Ref CertificateArn, ""]
+
 Resources:
 
-  WebsiteTopLevelDomainDNS:
+  TLDRedirectWithHttpsBucket:
+    Type: AWS::S3::Bucket
+    Condition: HttpsEnabled
+    Properties:
+      BucketName: !ImportValue DomainName
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        RedirectAllRequestsTo:
+          HostName: !Ref DNSName
+          Protocol: 'https'
+
+  TLDRedirectWithHttpsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Condition: HttpsEnabled
+    Properties:
+      Bucket: !Ref 'TLDRedirectWithHttpsBucket'
+      PolicyDocument:
+        Statement:
+        - Sid: PublicReadForGetBucketObjects
+          Effect: Allow
+          Principal: '*'
+          Action: s3:GetObject
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref 'TLDRedirectWithHttpsBucket', /*]]
+
+  TLDRedirectWithHttpsCloudFront:
+    Type: AWS::CloudFront::Distribution
+    Condition: HttpsEnabled
+    Properties:
+      DistributionConfig:
+        Comment: Cloudfront Distribution pointing to S3 Bucket
+        Origins:
+        - DomainName: !Select [2, !Split ["/", !GetAtt TLDRedirectWithHttpsBucket.WebsiteURL]]
+          Id: S3Origin
+          CustomOriginConfig:
+            HTTPPort: 80
+            HTTPSPort: 443
+            OriginProtocolPolicy: http-only
+        Enabled: true
+        HttpVersion: 'http2'
+        Aliases:
+        - !ImportValue DomainName
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          Compress: true
+          TargetOriginId: S3Origin
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+
+  TLDRedirectWithHttpsDNSName:
     Type: AWS::Route53::RecordSetGroup
+    Condition: HttpsEnabled
     Properties:
       HostedZoneName: !Join ['', [!ImportValue DomainName, .]]
       RecordSets:
-      - Name: !Join ['', [!ImportValue DomainName, .]]
+      - Name: !ImportValue DomainName
         Type: A
         AliasTarget:
           HostedZoneId: Z2FDTNDATAQYW2
-          DNSName: !Ref DNSName
+          DNSName: !GetAtt [TLDRedirectWithHttpsCloudFront, DomainName]
+
+  TLDRedirectWithoutHttpsBucket:
+    Type: AWS::S3::Bucket
+    Condition: HttpsDisabled
+    Properties:
+      BucketName: !ImportValue DomainName
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        RedirectAllRequestsTo:
+          HostName: !Ref DNSName
+          Protocol: 'http'
+
+  TLDRedirectWithoutHttpsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Condition: HttpsDisabled
+    Properties:
+      Bucket: !Ref 'TLDRedirectWithoutHttpsBucket'
+      PolicyDocument:
+        Statement:
+        - Sid: PublicReadForGetBucketObjects
+          Effect: Allow
+          Principal: '*'
+          Action: s3:GetObject
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref 'TLDRedirectWithoutHttpsBucket', /*]]
+
+  TLDRedirectWithoutHttpsCloudFront:
+    Type: AWS::CloudFront::Distribution
+    Condition: HttpsDisabled
+    Properties:
+      DistributionConfig:
+        Comment: Cloudfront Distribution pointing to S3 Bucket
+        Origins:
+        - DomainName: !Select [2, !Split ["/", !GetAtt TLDRedirectWithoutHttpsBucket.WebsiteURL]]
+          Id: S3Origin
+          CustomOriginConfig:
+            HTTPPort: 80
+            HTTPSPort: 443
+            OriginProtocolPolicy: http-only
+        Enabled: true
+        HttpVersion: 'http2'
+        Aliases:
+        - !ImportValue DomainName
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          Compress: true
+          TargetOriginId: S3Origin
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: allow-all
+        PriceClass: PriceClass_All
+
+  TLDRedirectWithoutHttpsDNSName:
+    Type: AWS::Route53::RecordSetGroup
+    Condition: HttpsDisabled
+    Properties:
+      HostedZoneName: !Join ['', [!ImportValue DomainName, .]]
+      RecordSets:
+      - Name: !ImportValue DomainName
+        Type: A
+        AliasTarget:
+          HostedZoneId: Z2FDTNDATAQYW2
+          DNSName: !GetAtt [TLDRedirectWithoutHttpsCloudFront, DomainName]

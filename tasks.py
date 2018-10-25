@@ -123,15 +123,15 @@ def update_cert_cf(c, stack_name, domain_name, profile):
 
 
 @task
-def create_tld_cf(c, stack_name, dns_name, profile):
+def create_tld_cf(c, stack_name, dns_name, cert_arn, profile):
     """Create the TLD CloudFormation stack."""
-    __create_update_tld(c, stack_name, dns_name, profile)
+    __create_update_tld(c, stack_name, dns_name, cert_arn, profile)
 
 
 @task
-def update_tld_cf(c, stack_name, dns_name, profile):
+def update_tld_cf(c, stack_name, dns_name, cert_arn, profile):
     """Update the TLD CloudFormation stack."""
-    __create_update_tld(c, stack_name, dns_name, profile, create=False)
+    __create_update_tld(c, stack_name, dns_name, cert_arn, profile, create=False)
 
 
 def __create_update_stack(c, stack_name, subdomain, profile, cert_arn, create=True):
@@ -186,7 +186,7 @@ def __create_update_cert(c, stack_name, domain_name, profile, create=True):
         --region us-east-1".format(action, stack_name, CERT_TEMPLATE, domain_name, profile))
 
 
-def __create_update_tld(c, stack_name, dns_name, profile, create=True):
+def __create_update_tld(c, stack_name, dns_name, cert_arn, profile, create=True):
     action = 'create' if create else 'update'
 
     c.run("aws cloudformation {0}-stack \
@@ -194,7 +194,8 @@ def __create_update_tld(c, stack_name, dns_name, profile, create=True):
         --template-body file://{2} \
         --parameters \
             ParameterKey=DNSName,ParameterValue={3} \
-        --profile {4}".format(action, stack_name, TLD_TEMPLATE, dns_name, profile))
+            ParameterKey=CertificateArn,ParameterValue={4} \
+        --profile {5}".format(action, stack_name, TLD_TEMPLATE, dns_name, cert_arn, profile))
 
 
 def __build(c):
