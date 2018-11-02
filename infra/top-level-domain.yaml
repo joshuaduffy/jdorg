@@ -50,7 +50,7 @@ Resources:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 Bucket
         Origins:
-        - DomainName: !ImportValue DomainName
+        - DomainName: !Select [2, !Split ["/", !GetAtt TLDRedirectWithHttpsBucket.WebsiteURL]]
           Id: S3Origin
           CustomOriginConfig:
             HTTPPort: 80
@@ -119,7 +119,7 @@ Resources:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 Bucket
         Origins:
-        - DomainName: !ImportValue DomainName
+        - DomainName: !Select [2, !Split ["/", !GetAtt TLDRedirectWithoutHttpsBucket.WebsiteURL]]
           Id: S3Origin
           CustomOriginConfig:
             HTTPPort: 80
