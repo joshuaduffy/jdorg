@@ -24,6 +24,7 @@ def install(c):
 @task
 def client_dev(c):
     """Start the API, then the client in development mode, with hot reloading."""
+    __copy_reqs(c)
     c.run("docker-compose -f {0}/docker-compose.yaml up -d api".format(HERE))
     c.run("cd jdorg && yarn start")
 
@@ -31,6 +32,7 @@ def client_dev(c):
 @task
 def api_dev(c):
     """Start the client, then the API in development mode, with hot reloading."""
+    __copy_reqs(c)
     c.run("docker-compose -f {0}/docker-compose.yaml up -d client".format(HERE))
     c.run("cd api && python main.py")
 
@@ -39,6 +41,7 @@ def api_dev(c):
 def up(c):
     """Build and run the application."""
     __build(c)
+    __copy_reqs(c)
     c.run("pipenv lock -r > ./api/requirements.txt")
     c.run("docker-compose -f {0}/docker-compose.yaml up -d".format(HERE))
 
@@ -200,3 +203,7 @@ def __create_update_tld(c, stack_name, dns_name, cert_arn, profile, create=True)
 
 def __build(c):
     c.run("cd jdorg && yarn build")
+
+
+def __copy_reqs(c):
+    c.run("pipenv lock -r > ./api/requirements.txt")
