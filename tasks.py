@@ -17,32 +17,19 @@ TLD_TEMPLATE = path.join(INFRA_FOLDER, 'top-level-domain.yaml')
 def install(c):
     """Install all packages."""
     c.run("cd jdorg && yarn install")
-    c.run("pipenv install")
     c.run("pipenv install --dev")
 
 
 @task
 def client_dev(c):
-    """Start the API, then the client in development mode, with hot reloading."""
-    __copy_reqs(c)
-    c.run("docker-compose -f {0}/docker-compose.yaml up -d api".format(HERE))
+    """Start the client in development mode, with hot reloading."""
     c.run("cd jdorg && yarn start")
-
-
-@task
-def api_dev(c):
-    """Start the client, then the API in development mode, with hot reloading."""
-    __copy_reqs(c)
-    c.run("docker-compose -f {0}/docker-compose.yaml up -d client".format(HERE))
-    c.run("cd api && python main.py")
 
 
 @task
 def up(c):
     """Build and run the application."""
     __build(c)
-    __copy_reqs(c)
-    c.run("pipenv lock -r > ./api/requirements.txt")
     c.run("docker-compose -f {0}/docker-compose.yaml up -d".format(HERE))
 
 
