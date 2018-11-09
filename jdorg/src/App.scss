@@ -1,19 +1,25 @@
 @import 'styles/Fade.scss';
 
-$screen-size: 600px;
-
 .flex-container {
   height: 100%;
-  margin: 5rem;
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
+  margin-top: 1rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
   display: flex;
-  align-items: center;
   flex-direction: column;
-  @media only screen and (max-width: $screen-size) {
-    margin: 1rem;
+  align-items: center;
+
+  @media only screen and (min-width: 768px) {
+    margin-left: 4rem;
+    margin-right: 4rem;
+  }
+  @media only screen and (min-width: 992px) {
+    margin-left: 8rem;
+    margin-right: 8rem;
+  }
+  @media only screen and (min-width: 1200px) {
+    margin-left: 16rem;
+    margin-right: 16rem;
   }
 }
 
@@ -25,8 +31,15 @@ $screen-size: 600px;
 .title {
   font-family: 'Aladin', cursive;
   font-size: 5rem;
-  @media only screen and (max-width: $screen-size) {
-    font-size: 3rem;
+
+  @media only screen and (min-width: 768px) {
+    font-size: 6rem;
+  }
+  @media only screen and (min-width: 992px) {
+    font-size: 7rem;
+  }
+  @media only screen and (min-width: 1200px) {
+    font-size: 8rem;
   }
 }
 
