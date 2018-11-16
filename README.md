@@ -24,10 +24,6 @@ Client development:
 
 `inv install client-dev`
 
-API development:
-
-`inv install api-dev`
-
 Build and serve inside an nginx container:
 
 `inv install up`
