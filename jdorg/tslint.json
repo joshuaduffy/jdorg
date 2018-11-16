@@ -1,5 +1,10 @@
 {
-  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier", "tslint-config-airbnb"],
+  "extends": [
+    "tslint:recommended",
+    "tslint-react",
+    "tslint-config-prettier",
+    "tslint-config-airbnb"
+  ],
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
@@ -7,5 +12,8 @@
       "coverage/lcov-report/*.js",
       "src/registerServiceWorker.ts"
     ]
+  },
+  "rules": {
+    "no-boolean-literal-compare": true
   }
 }
