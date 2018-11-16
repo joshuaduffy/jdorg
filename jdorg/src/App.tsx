@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import fistSvg from './fist.svg';
+import fistSvg from './images/fist.svg';
 
 import './App.scss';
 
