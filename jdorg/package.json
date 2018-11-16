@@ -3,17 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react": "^16.6.1",
-    "react-dom": "^16.6.1",
+    "react": "16.6.3",
+    "react-dom": "16.6",
     "react-scripts": "2.1.1"
   },
   "devDependencies": {
     "@types/jest": "^23.3.9",
-    "@types/node": "^10.12.3",
-    "@types/react": "^16.7.1",
+    "@types/node": "10.12.9",
+    "@types/react": "16.7.6",
     "@types/react-dom": "^16.0.9",
     "node-sass": "^4.10.0",
-    "tslint-config-airbnb": "^5.11.0",
+    "tslint": "^5.11.0",
+    "tslint-config-airbnb": "5.11.1",
+    "tslint-config-prettier": "^1.16.0",
+    "tslint-react": "^3.6.0",
     "typescript": "^3.1.6"
   },
   "scripts": {
@@ -21,9 +24,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": [
     ">0.2%",
