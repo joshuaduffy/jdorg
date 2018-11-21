@@ -190,7 +190,3 @@ def __create_update_tld(c, stack_name, dns_name, cert_arn, profile, create=True)
 
 def __build(c):
     c.run("cd jdorg && yarn build")
-
-
-def __copy_reqs(c):
-    c.run("pipenv lock -r > ./api/requirements.txt")

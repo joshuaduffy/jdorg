@@ -23,6 +23,3 @@ requirements.txt
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Compiled CSS
-*.css
