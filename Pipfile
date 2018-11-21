@@ -5,11 +5,6 @@ verify_ssl = true
 name = "pypi"
 
 
-[packages]
-
-flask-restplus = "*"
-
-
 [dev-packages]
 
 invoke = "*"
