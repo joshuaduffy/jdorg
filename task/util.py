@@ -23,7 +23,7 @@ def command(exe=None, *args):
     """Construct a console command from a list of arguments."""
     executable = which(exe)
     if executable:
-        return run(f'{executable} {__format_args(args)}')
+        return run(f'"{executable}" {__format_args(args)}')
     else:
         raise FileNotFoundError(exe)
 
