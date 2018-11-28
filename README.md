@@ -7,7 +7,7 @@
 * `node`
 * `yarn`
 
-## First step
+## Getting started
 
 1. Create a new virtual environment via `pipenv --three`
 2. Install the dependencies via `pipenv install --dev`
