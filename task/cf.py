@@ -13,8 +13,8 @@ def validate(c, profile):
     with chdir(WORKING_DIR):
         for file in listdir():
             aws('cloudformation', 'validate-template',
-                f'--template-body file://{file}',
-                f'--profile {profile}')
+                '--template-body', f'file://{file}',
+                f'--profile', f'{profile}')
 
 
 @task(help={
@@ -27,22 +27,22 @@ def update_dns(c, stack_name, domain_name, profile, create=False):
 
     with chdir(WORKING_DIR):
         aws('cloudformation', f'{action}-stack',
-            f'--stack-name {stack_name}-dns',
-            '--template-body file://zone.yaml',
+            '--stack-name' f'{stack_name}-dns',
+            '--template-body', f'file://zone.yaml',
             '--parameters',
             f'ParameterKey=DomainName,ParameterValue={domain_name}',
-            f'--profile {profile}')
+            f'--profile', f'{profile}')
 
     aws('cloudformation', 'wait',
         f'stack-{action}-complete',
-        f'--stack-name {stack_name}-dns',
-        f'--profile {profile}')
+        '--stack-name', f'{stack_name}-dns',
+        f'--profile', f'{profile}')
 
     with chdir(WORKING_DIR):
         aws('cloudformation', f'{action}-stack',
-            f'--stack-name {stack_name}-dns-mail',
-            '--template-body file://mail.yaml',
-            f'--profile {profile}')
+            '--stack-name', f'{stack_name}-dns-mail',
+            '--template-body', f'file://mail.yaml',
+            f'--profile', f'{profile}')
 
 
 @task(help={
@@ -55,18 +55,18 @@ def update_cert(c, stack_name, domain_name, profile, create=False):
 
     with chdir(WORKING_DIR):
         aws('cloudformation', f'{action}-stack',
-            f'--stack-name {stack_name}-cert',
-            '--template-body file://cert.yaml',
+            '--stack-name', f'{stack_name}-cert',
+            '--template-body', f'file://cert.yaml',
             '--parameters',
             f'ParameterKey=DomainName,ParameterValue={domain_name}',
-            f'--profile {profile}')
+            f'--profile', f'{profile}')
         # Cert also needs adding to us-east-1 to be used by CloudFront
         aws('cloudformation', f'{action}-stack',
-            f'--stack-name {stack_name}-cert',
-            '--template-body file://cert.yaml',
+            '--stack-name', f'{stack_name}-cert',
+            '--template-body', f'file://cert.yaml',
             '--parameters',
             f'ParameterKey=DomainName,ParameterValue={domain_name}',
-            f'--profile {profile}',
+            f'--profile', f'{profile}',
             '--region us-east-1')
 
 
@@ -81,12 +81,12 @@ def update_client(c, stack_name, subdomain, cert_arn, profile, create=False):
 
     with chdir(WORKING_DIR):
         aws('cloudformation', f'{action}-stack',
-            f'--stack-name {stack_name}-client',
-            '--template-body file://static-site.yaml',
+            '--stack-name', f'{stack_name}-client',
+            '--template-body', f'file://static-site.yaml',
             '--parameters',
             f'ParameterKey=Subdomain,ParameterValue={subdomain}',
             f'ParameterKey=CertificateArn,ParameterValue={cert_arn}',
-            f'--profile {profile}')
+            f'--profile', f'{profile}')
 
 
 @task(help={
@@ -100,9 +100,9 @@ def update_tld_redirect(c, stack_name, dns_name, cert_arn, profile, create=False
 
     with chdir(WORKING_DIR):
         aws('cloudformation', f'{action}-stack',
-            f'--stack-name {stack_name}-dns-tld',
-            '--template-body file://top-level-domain.yaml',
+            '--stack-name', f'{stack_name}-dns-tld',
+            '--template-body', f'file://top-level-domain.yaml',
             '--parameters',
             f'ParameterKey=DNSName,ParameterValue={dns_name}',
             f'ParameterKey=CertificateArn,ParameterValue={cert_arn}',
-            f'--profile {profile}')
+            f'--profile', f'{profile}')
