@@ -17,3 +17,7 @@ Enter a shell session via `pipenv shell` to run `inv` commands (or prepend `pipe
 ## List invoke commands
 
 `inv --list`
+
+## Documentation for invoke commands
+
+`inv --help COMMAND`
