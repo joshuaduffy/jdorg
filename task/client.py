@@ -40,21 +40,22 @@ def test(c):
 def deploy(c, profile):
     """Deploy client to S3."""
     with chdir(WORKING_DIR):
-        aws('s3', 'sync', 'build', 's3://www.joshuaduffy.org',
+        aws('s3', 'sync', 'build',
+            's3://www.joshuaduffy.org',
             '--delete',
-            '--cache-control no-cache,no-store,must-revalidate',
-            f'--profile {profile}')
+            '--cache-control', 'no-cache,no-store,must-revalidate',
+            f'--profile', f'{profile}')
         aws('s3', 'cp',
             's3://www.joshuaduffy.org/static',
             's3://www.joshuaduffy.org/static',
             '--recursive',
-            '--metadata-directive REPLACE',
-            '--cache-control public,max-age=31536000',
-            f'--profile {profile}')
+            '--metadata-directive', 'REPLACE',
+            '--cache-control', 'public,max-age=31536000',
+            f'--profile', f'{profile}')
         aws('s3', 'cp',
             's3://www.joshuaduffy.org/service-worker.js',
             's3://www.joshuaduffy.org/service-worker.js',
-            '--metadata-directive REPLACE',
-            '--cache-control no-cache,no-store,must-revalidate',
-            '--content-type application/javascript',
-            f'--profile {profile}')
+            '--metadata-directive', 'REPLACE',
+            '--cache-control', 'no-cache,no-store,must-revalidate',
+            '--content-type', 'application/javascript',
+            f'--profile', f'{profile}')
