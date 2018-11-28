@@ -18,16 +18,6 @@ Enter a shell session via `pipenv shell` to run `inv` commands (or prepend `pipe
 
 `inv --list`
 
-## Common commands
+## Documentation for invoke commands
 
-Client development:
-
-`inv install client-dev`
-
-Build and serve inside an nginx container:
-
-`inv install up`
-
-Run the tests:
-
-`inv install test`
+`inv --help COMMAND`
