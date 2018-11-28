@@ -16,8 +16,6 @@ build
 .env.test.local
 .env.production.local
 
-requirements.txt
-
 .vscode
 
 npm-debug.log*
