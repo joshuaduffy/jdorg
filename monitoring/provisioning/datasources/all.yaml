@@ -3,9 +3,13 @@ apiVersion: 1
 datasources:
 - name: CloudWatch
   type: cloudwatch
+  access: direct
+  orgId: 1
+  isDefault: true
+  editable: true
   jsonData:
     authType: keys
-    defaultRegion: eu-west-2
+    defaultRegion: eu-west-1
   secureJsonData:
-    accessKey: "<your access key>"
-    secretKey: "<your secret key>"
+    accessKey: ...
+    secretKey: ...
