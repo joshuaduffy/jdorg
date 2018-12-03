@@ -31,5 +31,5 @@ def command(exe=None, *args):
 def __format_args(*args):
     """Format the arguments for a console command."""
     if 'Windows' in platform():
-        return list2cmdline(args)
+        return list2cmdline(*args)
     return ' '.join(map(quote, *args))
