@@ -1,5 +1,5 @@
 from invoke import Collection
-from task import cf, client, monitoring
+from inv import cf, client, monitoring
 
 # https://code.visualstudio.com/docs/python/debugging#_attach-to-a-local-script
 # import ptvsd

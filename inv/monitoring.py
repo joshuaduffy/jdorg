@@ -9,4 +9,4 @@ WORKING_DIR = 'monitoring'
 def up(c):
     """Builds, creates/re-creates and starts the containers."""
     with chdir(WORKING_DIR):
-        docker_compose('up')
+        docker_compose('up', '--force-recreate', '--renew-anon-volumes')
