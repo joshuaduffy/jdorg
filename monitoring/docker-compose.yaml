@@ -4,7 +4,7 @@ services:
   grafana:
     image: grafana/grafana:5.3.4
     ports:
-      - 3001:3000
+      - 3000:3000
     volumes:
       - ./provisioning:/etc/grafana/provisioning
       - ./dashboards:/var/lib/grafana/dashboards
@@ -13,7 +13,6 @@ services:
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
       GF_SERVER_ENABLE_GZIP: 'true'
       GF_USERS_DEFAULT_THEME: dark
-      GF_SECURITY_ADMIN_USER: jdorg
     networks:
       - default
 
