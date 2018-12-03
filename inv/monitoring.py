@@ -7,6 +7,6 @@ WORKING_DIR = 'monitoring'
 
 @task
 def up(c):
-    """Builds, creates/re-creates and starts the containers."""
+    """Builds, creates/re-creates and starts the grafana container."""
     with chdir(WORKING_DIR):
         docker_compose('up', '--force-recreate', '--renew-anon-volumes')

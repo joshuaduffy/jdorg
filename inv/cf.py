@@ -18,8 +18,8 @@ def validate(c, profile):
 
 
 @task(help={
-    "stack_name": "The name to prefix before the stack.",
-    "domain_name": "The domain name to configure. (e.g. joshuaduffy.org)",
+    "stack-name": "The name to prefix before the stack.",
+    "domain-name": "The domain name to configure. (e.g. joshuaduffy.org)",
     "profile": "A valid AWS profile."
 })
 def update_dns(c, stack_name, domain_name, profile, create=False):
@@ -46,8 +46,8 @@ def update_dns(c, stack_name, domain_name, profile, create=False):
 
 
 @task(help={
-    "stack_name": "The name to prefix before the stack.",
-    "domain_name": "The domain name to configure. (e.g. joshuaduffy.org)",
+    "stack-name": "The name to prefix before the stack.",
+    "domain-name": "The domain name to configure. (e.g. joshuaduffy.org)",
     "profile": "A valid AWS profile."
 })
 def update_cert(c, stack_name, domain_name, profile, create=False):
@@ -71,9 +71,9 @@ def update_cert(c, stack_name, domain_name, profile, create=False):
 
 
 @task(help={
-    "stack_name": "The name to prefix before the stack.",
+    "stack-name": "The name to prefix before the stack.",
     "subdomain": "The subdomain to configure. (e.g. www)",
-    "cert_arn": "A valid certificate ARN.",
+    "cert-arn": "A valid certificate ARN.",
     "profile": "A valid AWS profile."
 })
 def update_client(c, stack_name, subdomain, cert_arn, profile, create=False):
@@ -90,9 +90,9 @@ def update_client(c, stack_name, subdomain, cert_arn, profile, create=False):
 
 
 @task(help={
-    "stack_name": "The name to prefix before the stack.",
-    "dns_name": "The DNS name you wish to alias to the TLD. (e.g. www.joshuaduffy.org)",
-    "cert_arn": "A valid certificate ARN.",
+    "stack-name": "The name to prefix before the stack.",
+    "dns-name": "The DNS name you wish to alias to the TLD. (e.g. www.joshuaduffy.org)",
+    "cert-arn": "A valid certificate ARN.",
     "profile": "A valid AWS profile."
 })
 def update_tld_redirect(c, stack_name, dns_name, cert_arn, profile, create=False):
