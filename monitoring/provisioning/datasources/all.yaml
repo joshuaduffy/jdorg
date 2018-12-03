@@ -8,8 +8,6 @@ datasources:
   isDefault: true
   editable: true
   jsonData:
-    authType: keys
+    authType: credentials
     defaultRegion: eu-west-1
-  secureJsonData:
-    accessKey: ...
-    secretKey: ...
+

@@ -8,6 +8,7 @@ services:
     volumes:
       - ./provisioning:/etc/grafana/provisioning
       - ./dashboards:/var/lib/grafana/dashboards
+      - ./credentials:/usr/share/grafana/credentials
       - grafana_data:/var/lib/grafana
     environment:
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
