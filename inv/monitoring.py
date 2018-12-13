@@ -13,8 +13,11 @@ WORKING_DIR = 'monitoring'
 def up(c, access_key=None, secret_key=None):
     """Builds, creates/re-creates and starts the grafana container."""
     with chdir(WORKING_DIR):
-        remove('credentials')
         if access_key and secret_key:
+            try:
+                remove('credentials')
+            except:
+                pass
             __create_credentials_file(access_key, secret_key)
         docker_compose('up', '--force-recreate', '--renew-anon-volumes')
 
