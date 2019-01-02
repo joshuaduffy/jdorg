@@ -1,5 +1,9 @@
 apiVersion: 1
 
+deleteDatasources:
+  - name: CloudWatch
+    orgId: 1
+
 datasources:
 - name: CloudWatch
   type: cloudwatch
