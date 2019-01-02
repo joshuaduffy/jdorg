@@ -5,5 +5,7 @@ providers:
   org_id: 1
   folder: ''
   type: file
+  disableDeletion: true
+  updateIntervalSeconds: 60
   options:
     path: '/var/lib/grafana/dashboards'
