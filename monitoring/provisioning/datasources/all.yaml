@@ -10,7 +10,7 @@ datasources:
   access: direct
   orgId: 1
   isDefault: true
-  editable: true
+  editable: false
   jsonData:
     authType: credentials
     defaultRegion: eu-west-1
