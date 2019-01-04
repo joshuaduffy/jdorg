@@ -11,9 +11,13 @@ services:
       - ./credentials:/usr/share/grafana/.aws/credentials
       - grafana_data:/var/lib/grafana
     environment:
-      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
-      GF_SERVER_ENABLE_GZIP: 'true'
-      GF_USERS_DEFAULT_THEME: dark
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - GF_SECURITY_DISABLE_GRAVATAR=true
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_USERS_ALLOW_ORG_CREATE=false
+      - GF_USERS_VIEWERS_CAN_EDIT=false
     networks:
       - default
 
