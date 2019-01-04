@@ -12,10 +12,11 @@
       }
     ]
   },
-  "editable": true,
+  "editable": false,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1546607844676,
+  "id": 1,
+  "iteration": 1546613400205,
   "links": [],
   "panels": [
     {
@@ -593,7 +594,6 @@
       {
         "allValue": null,
         "current": {
-          "tags": [],
           "text": "EMYJ27235M4Z",
           "value": "EMYJ27235M4Z"
         },
@@ -603,20 +603,9 @@
         "label": "DistributionId",
         "multi": false,
         "name": "distributionId",
-        "options": [
-          {
-            "selected": false,
-            "text": "E23GES4Q0U1CVH",
-            "value": "E23GES4Q0U1CVH"
-          },
-          {
-            "selected": true,
-            "text": "EMYJ27235M4Z",
-            "value": "EMYJ27235M4Z"
-          }
-        ],
+        "options": [],
         "query": "dimension_values(us-east-1, AWS/CloudFront, Requests, DistributionId)",
-        "refresh": 0,
+        "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
@@ -660,5 +649,5 @@
   "timezone": "browser",
   "title": "joshuaduffy.org",
   "uid": "jd",
-  "version": 6
+  "version": 1
 }
