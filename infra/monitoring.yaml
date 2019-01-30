@@ -1,11 +1,27 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'ECS cluster and ALB for Grafana'
-Parameters: null
+
+Description: ECS cluster and ALB for Grafana
+
+Parameters:
+
+  Subdomain:
+    Type: String
+    Description: The subdomain to use e.g. dev, test, prod
+
+  CertificateArn:
+    Type: String
+    Description: ARN of the certificate in ACM
+
+Conditions:
+
+  HttpsEnabled: !Not [!Equals [!Ref CertificateArn, ""]]
+  HttpsDisabled: !Equals [!Ref CertificateArn, ""]
+
 Resources:
   GrafanaExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: null
+      RoleName: !Join [ "-", [!ImportValue DomainName,  "graf-exec-rol"]]
       AssumeRolePolicyDocument:
         Statement:
           -
@@ -15,43 +31,45 @@ Resources:
                 - ecs-tasks.amazonaws.com
             Action:
               - 'sts:AssumeRole'
-      Path: /appt/
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
-    GrafanaRole:
-      Type: 'AWS::IAM::Role'
-      Properties:
-        RoleName: null
-        AssumeRolePolicyDocument:
-          Statement:
-            -
-              Effect: Allow
-              Principal:
-                Service:
-                  - ecs-tasks.amazonaws.com
-              Action:
-                - 'sts:AssumeRole'
-        Path: /appt/
-        Policies:
+
+  GrafanaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Join [ "-", [!ImportValue DomainName,  "graf-rol"]]
+      AssumeRolePolicyDocument:
+        Statement:
           -
-            PolicyName: null
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                -
-                  Effect: Allow
-                  Action:
-                    - 'cloudwatch:GetMetricStatistics'
-                    - 'cloudwatch:ListMetrics'
-                  Resource: '*'
+            Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        -
+          PolicyName: !Join [ "-", [!ImportValue DomainName,  "graf-pol"]]
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - 'cloudwatch:GetMetricStatistics'
+                  - 'cloudwatch:ListMetrics'
+                Resource: '*'
+
   GrafanaEcr:
     Type: 'AWS::ECR::Repository'
     Properties:
-      RepositoryName: appt-graf-ecr
+      RepositoryName: !Join [ "-", [!ImportValue DomainName,  "graf-ecr"]]
+
   GrafanaTaskDefinition:
     Type: 'AWS::ECS::TaskDefinition'
+    DependsOn: GrafanaEcr
     Properties:
-      Family: null
+      Family: !Join [ "-", [!ImportValue DomainName,  "graf-td"]]
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
@@ -75,90 +93,108 @@ Resources:
           PortMappings:
             -
               ContainerPort: 3000
-    GrafanaALB:
-      Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
-      Properties:
-        Name: null
-        Scheme: internet-facing
-        LoadBalancerAttributes:
+
+  GrafanaALB:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: null
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        -
+          Key: idle_timeout.timeout_seconds
+          Value: '30'
+      Subnets:
+        'Fn::Split':
+          - ','
           -
-            Key: idle_timeout.timeout_seconds
-            Value: '30'
-        Subnets:
-          'Fn::Split':
-            - ','
-            -
-              'Fn::ImportValue': null
-        SecurityGroups:
-          - null
-    GrafanaALBListener:
-      Type: 'AWS::ElasticLoadBalancingV2::Listener'
-      Properties:
-        DefaultActions:
-          -
-            Type: forward
-            TargetGroupArn: null
-        LoadBalancerArn: null
-        Port: 443
-        Protocol: HTTPS
-        SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01
-        Certificates:
-          -
-            CertificateArn:
-              'Fn::ImportValue': null
-    GrafanaALBListenerRule:
-      Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
-      Properties:
-        Actions:
-          -
-            Type: forward
-            TargetGroupArn: null
-        Conditions:
-          -
-            Field: path-pattern
-            Values:
-              - /
-        ListenerArn: null
-        Priority: 1
-    GrafanaALBTargetGroup:
-      Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
-      DependsOn: MonitoringEcsAlb
-      Properties:
-        Name: null
-        HealthCheckIntervalSeconds: 10
-        HealthCheckPath: /api/health
-        HealthCheckProtocol: HTTP
-        HealthCheckTimeoutSeconds: 5
-        HealthyThresholdCount: 2
-        Port: 80
-        Protocol: HTTP
-        TargetType: ip
-        UnhealthyThresholdCount: 2
-        VpcId:
-          'Fn::ImportValue': null
-    GrafanaService:
-      Type: 'AWS::ECS::Service'
-      DependsOn: GrafanaALBListener
-      Properties:
-        Cluster: null
-        LaunchType: FARGATE
-        NetworkConfiguration:
-          AwsvpcConfiguration:
-            AssignPublicIp: DISABLED
-            SecurityGroups:
-              - null
-            Subnets:
-              'Fn::Split':
-                - ','
-                -
-                  'Fn::ImportValue': null
-        DesiredCount: 1
-        LoadBalancers:
-          -
-            ContainerName: Grafana
-            ContainerPort: 3000
-            TargetGroupArn: null
-        TaskDefinition: null
+            'Fn::ImportValue': null
+      SecurityGroups:
+        - null
+
+  GrafanaALBListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        -
+          Type: forward
+          TargetGroupArn: null
+      LoadBalancerArn: null
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01
+      Certificates:
+        -
+          CertificateArn:
+            'Fn::ImportValue': null
+
+  GrafanaALBListenerRule:
+    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
+    Properties:
+      Actions:
+        -
+          Type: forward
+          TargetGroupArn: null
+      Conditions:
+        -
+          Field: path-pattern
+          Values:
+            - /
+      ListenerArn: null
+      Priority: 1
+
+  GrafanaALBTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    DependsOn: MonitoringEcsAlb
+    Properties:
+      Name: null
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /api/health
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      UnhealthyThresholdCount: 2
+      VpcId:
+        'Fn::ImportValue': null
+
+  GrafanaService:
+    Type: 'AWS::ECS::Service'
+    DependsOn: GrafanaALBListener
+    Properties:
+      Cluster: null
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - null
+          Subnets:
+            'Fn::Split':
+              - ','
+              -
+                'Fn::ImportValue': null
+      DesiredCount: 1
+      LoadBalancers:
+        -
+          ContainerName: Grafana
+          ContainerPort: 3000
+          TargetGroupArn: null
+      TaskDefinition: null
+
+  WebsiteWithoutHttpsDNSName:
+    Type: AWS::Route53::RecordSetGroup
+    Condition: HttpsDisabled
+    Properties:
+      HostedZoneName: !Join ['', [!ImportValue DomainName, .]]
+      RecordSets:
+      - Name: !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
+        Type: A
+        AliasTarget:
+          HostedZoneId: Z2FDTNDATAQYW2
+          DNSName: !GetAtt [WebsiteWithoutHttpsCloudFront, DomainName]
+
 Outputs:
   GrafanaDnsName:
     Description: 'Grafana DNS Name'
