@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'ECS cluster and ALB for Grafana'
+Parameters: null
+Resources:
+  GrafanaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: null
+      AssumeRolePolicyDocument:
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /appt/
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+    GrafanaRole:
+      Type: 'AWS::IAM::Role'
+      Properties:
+        RoleName: null
+        AssumeRolePolicyDocument:
+          Statement:
+            -
+              Effect: Allow
+              Principal:
+                Service:
+                  - ecs-tasks.amazonaws.com
+              Action:
+                - 'sts:AssumeRole'
+        Path: /appt/
+        Policies:
+          -
+            PolicyName: null
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                -
+                  Effect: Allow
+                  Action:
+                    - 'cloudwatch:GetMetricStatistics'
+                    - 'cloudwatch:ListMetrics'
+                  Resource: '*'
+  GrafanaEcr:
+    Type: 'AWS::ECR::Repository'
+    Properties:
+      RepositoryName: appt-graf-ecr
+  GrafanaTaskDefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      Family: null
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: 1024
+      Memory: 2048
+      ExecutionRoleArn:
+        'Fn::ImportValue': null
+      TaskRoleArn:
+        'Fn::ImportValue': null
+      ContainerDefinitions:
+        -
+          Name: Grafana
+          Essential: true
+          Image: null
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: null
+              awslogs-region: null
+              awslogs-stream-prefix: Grafana
+          PortMappings:
+            -
+              ContainerPort: 3000
+    GrafanaALB:
+      Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+      Properties:
+        Name: null
+        Scheme: internet-facing
+        LoadBalancerAttributes:
+          -
+            Key: idle_timeout.timeout_seconds
+            Value: '30'
+        Subnets:
+          'Fn::Split':
+            - ','
+            -
+              'Fn::ImportValue': null
+        SecurityGroups:
+          - null
+    GrafanaALBListener:
+      Type: 'AWS::ElasticLoadBalancingV2::Listener'
+      Properties:
+        DefaultActions:
+          -
+            Type: forward
+            TargetGroupArn: null
+        LoadBalancerArn: null
+        Port: 443
+        Protocol: HTTPS
+        SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01
+        Certificates:
+          -
+            CertificateArn:
+              'Fn::ImportValue': null
+    GrafanaALBListenerRule:
+      Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
+      Properties:
+        Actions:
+          -
+            Type: forward
+            TargetGroupArn: null
+        Conditions:
+          -
+            Field: path-pattern
+            Values:
+              - /
+        ListenerArn: null
+        Priority: 1
+    GrafanaALBTargetGroup:
+      Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+      DependsOn: MonitoringEcsAlb
+      Properties:
+        Name: null
+        HealthCheckIntervalSeconds: 10
+        HealthCheckPath: /api/health
+        HealthCheckProtocol: HTTP
+        HealthCheckTimeoutSeconds: 5
+        HealthyThresholdCount: 2
+        Port: 80
+        Protocol: HTTP
+        TargetType: ip
+        UnhealthyThresholdCount: 2
+        VpcId:
+          'Fn::ImportValue': null
+    GrafanaService:
+      Type: 'AWS::ECS::Service'
+      DependsOn: GrafanaALBListener
+      Properties:
+        Cluster: null
+        LaunchType: FARGATE
+        NetworkConfiguration:
+          AwsvpcConfiguration:
+            AssignPublicIp: DISABLED
+            SecurityGroups:
+              - null
+            Subnets:
+              'Fn::Split':
+                - ','
+                -
+                  'Fn::ImportValue': null
+        DesiredCount: 1
+        LoadBalancers:
+          -
+            ContainerName: Grafana
+            ContainerPort: 3000
+            TargetGroupArn: null
+        TaskDefinition: null
+Outputs:
+  GrafanaDnsName:
+    Description: 'Grafana DNS Name'
+    Value: null
