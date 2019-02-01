@@ -117,8 +117,9 @@ Resources:
           Key: idle_timeout.timeout_seconds
           Value: '30'
 
-  GrafanaALBListener:
+  GrafanaWithHttpsALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HttpsEnabled
     Properties:
       DefaultActions:
         -
@@ -132,8 +133,9 @@ Resources:
         -
           CertificateArn: !Ref CertificateArn
 
-  GrafanaALBListenerRule:
+  GrafanaWithHttpsALBListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: HttpsEnabled
     Properties:
       Actions:
         -
@@ -144,7 +146,35 @@ Resources:
           Field: path-pattern
           Values:
             - /
-      ListenerArn: !Ref GrafanaALBListener
+      ListenerArn: !Ref GrafanaWithHttpsALBListener
+      Priority: 1
+
+  GrafanaWithoutHttpsALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HttpsDisabled
+    Properties:
+      DefaultActions:
+        -
+          Type: forward
+          TargetGroupArn: !Ref GrafanaALBTargetGroup
+      LoadBalancerArn: !Ref GrafanaALB
+      Port: 80
+      Protocol: HTTP
+
+  GrafanaWithoutHttpsALBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: HttpsDisabled
+    Properties:
+      Actions:
+        -
+          Type: forward
+          TargetGroupArn: !Ref GrafanaALBTargetGroup
+      Conditions:
+        -
+          Field: path-pattern
+          Values:
+            - /
+      ListenerArn: !Ref GrafanaWithoutHttpsALBListener
       Priority: 1
 
   GrafanaALBTargetGroup:
@@ -165,7 +195,6 @@ Resources:
 
   GrafanaService:
     Type: AWS::ECS::Service
-    DependsOn: GrafanaALBListener
     Properties:
       Cluster: !Ref GrafanaECSCluster
       LaunchType: FARGATE
