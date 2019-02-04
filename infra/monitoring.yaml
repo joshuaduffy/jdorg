@@ -12,10 +12,6 @@ Parameters:
     Type: String
     Description: ARN of the certificate in ACM
 
-  VpcId:
-    Type: AWS::EC2::VPC::Id
-    Description: ID of VPC
-
 Conditions:
 
   HttpsEnabled: !Not [!Equals [!Ref CertificateArn, ""]]
@@ -191,7 +187,7 @@ Resources:
       Protocol: HTTP
       TargetType: ip
       UnhealthyThresholdCount: 2
-      VpcId: !Ref VpcId
+      VpcId: !ImportValue VpcId
 
   GrafanaService:
     Type: AWS::ECS::Service
