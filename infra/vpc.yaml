@@ -187,15 +187,3 @@ Outputs:
     Value: !Ref VPC
     Export:
       Name: VpcId
-
-  PublicSubnets:
-    Description: A list of the public subnets
-    Value: !Join [ ",", [ !Ref PublicSubnetA, !Ref PublicSubnetB, !Ref PublicSubnetC ]]
-    Export:
-      Name: PublicSubnets
-
-  PrivateSubnets:
-    Description: A list of the private subnets
-    Value: !Join [ ",", [ !Ref PrivateSubnetA, !Ref PrivateSubnetB, !Ref PrivateSubnetC ]]
-    Export:
-      Name: PrivateSubnets
