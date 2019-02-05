@@ -41,6 +41,7 @@ def push(c, profile, aws_account_id='380760145297', aws_region='eu-west-1', ecr_
         c.run(aws('aws', 'ecr', 'get-login', '--registry-ids', aws_account_id, '--no-include-email', '--profile', profile))
         docker('push', f'{aws_account_id}.dkr.ecr.{aws_region}.amazonaws.com/{ecr_repo_name}:{tag}')
 
+
 def __create_credentials_file(access_key, secret_key):
     config = [
         '[default]',
