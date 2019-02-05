@@ -1,6 +1,6 @@
 from os import environ, remove
 from invoke import task
-from .commands import docker_compose
+from .commands import docker_compose, docker, aws
 from .util import chdir
 
 WORKING_DIR = 'monitoring'
@@ -29,6 +29,17 @@ def up(c, admin_user, admin_password, access_key=None, secret_key=None):
 
         docker_compose('up', '--force-recreate', '--renew-anon-volumes')
 
+
+@task(help={
+    "profile": "A valid AWS profile."
+})
+def push(c, profile, aws_account_id='380760145297', aws_region='eu-west-1', ecr_repo_name='joshuaduffy.org-graf-ecr', tag='latest'):
+    """Build and push the container to ECR"""
+    with chdir(WORKING_DIR):
+        docker('build', '-t', 'grafana', '.')
+        docker('tag', 'grafana', f'{aws_account_id}.dkr.ecr.{aws_region}.amazonaws.com/{ecr_repo_name}:{tag}')
+        c.run(aws('aws', 'ecr', 'get-login', '--registry-ids', aws_account_id, '--no-include-email', '--profile', profile))
+        docker('push', f'{aws_account_id}.dkr.ecr.{aws_region}.amazonaws.com/{ecr_repo_name}:{tag}')
 
 def __create_credentials_file(access_key, secret_key):
     config = [

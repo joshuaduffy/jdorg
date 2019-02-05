@@ -10,6 +10,7 @@ WORKING_DIR = 'infra'
     "profile": "A valid AWS profile"
 })
 def validate(c, profile):
+    """Validate CloudFormation templates"""
     with chdir(WORKING_DIR):
         for file in listdir():
             aws('cloudformation', 'validate-template',
@@ -23,6 +24,7 @@ def validate(c, profile):
     "profile": "A valid AWS profile."
 })
 def update_dns(c, stack_name, domain_name, profile, create=False):
+    """Create or update DNS CloudFormation stack"""
     action = 'create' if create else 'update'
 
     with chdir(WORKING_DIR):
@@ -51,6 +53,7 @@ def update_dns(c, stack_name, domain_name, profile, create=False):
     "profile": "A valid AWS profile."
 })
 def update_cert(c, stack_name, domain_name, profile, create=False):
+    """Create or update certificate CloudFormation stack"""
     action = 'create' if create else 'update'
 
     with chdir(WORKING_DIR):
@@ -77,6 +80,7 @@ def update_cert(c, stack_name, domain_name, profile, create=False):
     "profile": "A valid AWS profile."
 })
 def update_client(c, stack_name, subdomain, cert_arn, profile, create=False):
+    """Create or update client/static site CloudFormation stack"""
     action = 'create' if create else 'update'
 
     with chdir(WORKING_DIR):
@@ -91,11 +95,12 @@ def update_client(c, stack_name, subdomain, cert_arn, profile, create=False):
 
 @task(help={
     "stack-name": "The name to prefix before the stack.",
-    "dns-name": "The DNS name you wish to alias to the TLD. (e.g. www.joshuaduffy.org)",
+    "fqdn": "The DNS name you wish to alias to the TLD. (e.g. www.joshuaduffy.org)",
     "cert-arn": "A valid certificate ARN.",
     "profile": "A valid AWS profile."
 })
-def update_tld_redirect(c, stack_name, dns_name, cert_arn, profile, create=False):
+def update_tld_redirect(c, stack_name, fqdn, cert_arn, profile, create=False):
+    """Create or update TLD redirect CloudFormation stack"""
     action = 'create' if create else 'update'
 
     with chdir(WORKING_DIR):
@@ -103,6 +108,41 @@ def update_tld_redirect(c, stack_name, dns_name, cert_arn, profile, create=False
             '--stack-name', f'{stack_name}-dns-tld',
             '--template-body', f'file://top-level-domain.yaml',
             '--parameters',
-            f'ParameterKey=DNSName,ParameterValue={dns_name}',
+            f'ParameterKey=FullyQualifiedDomainName,ParameterValue={fqdn}',
+            f'ParameterKey=CertificateArn,ParameterValue={cert_arn}',
+            f'--profile', f'{profile}')
+
+
+@task(help={
+    "stack-name": "The name to prefix before the stack.",
+    "profile": "A valid AWS profile."
+})
+def update_vpc(c, stack_name, profile, create=False):
+    """Create or update VPC CloudFormation stack"""
+    action = 'create' if create else 'update'
+
+    with chdir(WORKING_DIR):
+        aws('cloudformation', f'{action}-stack',
+            '--stack-name', f'{stack_name}-vpc',
+            '--template-body', f'file://vpc.yaml',
+            f'--profile', f'{profile}')
+
+
+@task(help={
+    "stack-name": "The name to prefix before the stack.",
+    "subdomain": "The subdomain to configure. (e.g. www)",
+    "cert-arn": "A valid certificate ARN.",
+    "profile": "A valid AWS profile."
+})
+def update_monitoring(c, stack_name, subdomain, cert_arn, profile, create=False):
+    """Create or update monitoring CloudFormation stack"""
+    action = 'create' if create else 'update'
+
+    with chdir(WORKING_DIR):
+        aws('cloudformation', f'{action}-stack',
+            '--stack-name', f'{stack_name}-dns-tld',
+            '--template-body', f'file://top-level-domain.yaml',
+            '--parameters',
+            f'ParameterKey=Subdomain,ParameterValue={subdomain}',
             f'ParameterKey=CertificateArn,ParameterValue={cert_arn}',
             f'--profile', f'{profile}')

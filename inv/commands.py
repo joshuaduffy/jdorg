@@ -14,3 +14,8 @@ def aws(*args):
 def docker_compose(*args):
     """Docker compose command"""
     return command('docker-compose', *args)
+
+
+def docker(*args):
+    """Docker command"""
+    return command('docker', *args)

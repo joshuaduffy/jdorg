@@ -4,9 +4,9 @@ Description: Route53 record for TLD
 
 Parameters:
 
-  DNSName:
+  FullyQualifiedDomainName:
     Type: String
-    Default: DNS Name to alias to the Top Level Domain Name
+    Default: FQDN to alias to the Top Level Domain Name
 
   CertificateArn:
     Type: String
@@ -27,7 +27,7 @@ Resources:
       AccessControl: PublicRead
       WebsiteConfiguration:
         RedirectAllRequestsTo:
-          HostName: !Ref DNSName
+          HostName: !Ref FullyQualifiedDomainName
           Protocol: 'https'
 
   TLDRedirectWithHttpsBucketPolicy:
@@ -96,7 +96,7 @@ Resources:
       AccessControl: PublicRead
       WebsiteConfiguration:
         RedirectAllRequestsTo:
-          HostName: !Ref DNSName
+          HostName: !Ref FullyQualifiedDomainName
           Protocol: 'http'
 
   TLDRedirectWithoutHttpsBucketPolicy:
