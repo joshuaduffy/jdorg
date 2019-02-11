@@ -109,7 +109,7 @@ Resources:
         -
           Name: Grafana
           Essential: true
-          Image: !GetAtt GrafanaEcr.Arn
+          Image: !Join [ ".", [ !Ref "AWS::AccountId", "dkr.ecr", !Ref "AWS::Region", !Join [ "/", [ "amazonaws.com", !Ref GrafanaEcr ] ] ] ]
           LogConfiguration:
             LogDriver: awslogs
             Options:
