@@ -22,12 +22,12 @@ Resources:
   GrafanaECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Join [ "-", [!ImportValue DomainName, "graf-ecs-clust"]]
+      ClusterName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-ecs-clust"]]
 
   GrafanaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Join [ "-", [!ImportValue DomainName, "graf-exec-rol"]]
+      RoleName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-exec-rol"]]
       AssumeRolePolicyDocument:
         Statement:
           -
@@ -43,7 +43,7 @@ Resources:
   GrafanaTaskRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Join [ "-", [!ImportValue DomainName, "graf-rol"]]
+      RoleName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-rol"]]
       AssumeRolePolicyDocument:
         Statement:
           -
@@ -55,7 +55,7 @@ Resources:
               - 'sts:AssumeRole'
       Policies:
         -
-          PolicyName: !Join [ "-", [!ImportValue DomainName, "graf-pol"]]
+          PolicyName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-pol"]]
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -69,18 +69,18 @@ Resources:
   GrafanaEcr:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Join [ "-", [!ImportValue DomainName, "graf-ecr"]]
+      RepositoryName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-ecr"]]
 
   GrafanaLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Join [ "-", [!ImportValue DomainName, "graf-log"]]
+      LogGroupName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-log"]]
       RetentionInDays: 60
 
   GrafanaTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Join [ "-", [!ImportValue DomainName, "graf-td"]]
+      Family: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-td"]]
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
@@ -106,12 +106,13 @@ Resources:
   GrafanaALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Join [ "-", [!ImportValue DomainName, "graf-alb"]]
+      Name: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-alb"]]
       Scheme: internet-facing
       LoadBalancerAttributes:
         -
           Key: idle_timeout.timeout_seconds
           Value: '30'
+      Subnets: !Split [",", !ImportValue PublicSubnets]
 
   GrafanaWithHttpsALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -177,7 +178,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     DependsOn: GrafanaALB
     Properties:
-      Name: !Join [ "-", [!ImportValue DomainName, "graf-alb-tg"]]
+      Name: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-alb-tg"]]
       HealthCheckIntervalSeconds: 10
       HealthCheckPath: /api/health
       HealthCheckProtocol: HTTP
@@ -189,8 +190,10 @@ Resources:
       UnhealthyThresholdCount: 2
       VpcId: !ImportValue VpcId
 
-  GrafanaService:
+  GrafanaWithHttpsService:
     Type: AWS::ECS::Service
+    Condition: HttpsEnabled
+    DependsOn: GrafanaWithHttpsALBListener
     Properties:
       Cluster: !Ref GrafanaECSCluster
       LaunchType: FARGATE
@@ -200,6 +203,29 @@ Resources:
           ContainerName: Grafana
           ContainerPort: 3000
           TargetGroupArn: !Ref GrafanaALBTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets: !Split [",", !ImportValue PrivateSubnets]
+      TaskDefinition: !Ref GrafanaTaskDefinition
+
+  GrafanaWithoutHttpsService:
+    Type: AWS::ECS::Service
+    Condition: HttpsDisabled
+    DependsOn: GrafanaWithoutHttpsALBListener
+    Properties:
+      Cluster: !Ref GrafanaECSCluster
+      LaunchType: FARGATE
+      DesiredCount: 1
+      LoadBalancers:
+        -
+          ContainerName: Grafana
+          ContainerPort: 3000
+          TargetGroupArn: !Ref GrafanaALBTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets: !Split [",", !ImportValue PrivateSubnets]
       TaskDefinition: !Ref GrafanaTaskDefinition
 
   GrafanaDNSName:
