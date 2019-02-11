@@ -140,8 +140,9 @@ def update_monitoring(c, stack_name, subdomain, cert_arn, profile, create=False)
 
     with chdir(WORKING_DIR):
         aws('cloudformation', f'{action}-stack',
-            '--stack-name', f'{stack_name}-dns-tld',
-            '--template-body', f'file://top-level-domain.yaml',
+            '--stack-name', f'{stack_name}-monitoring',
+            '--template-body', f'file://monitoring.yaml',
+            '--capabilities', 'CAPABILITY_NAMED_IAM',
             '--parameters',
             f'ParameterKey=Subdomain,ParameterValue={subdomain}',
             f'ParameterKey=CertificateArn,ParameterValue={cert_arn}',
