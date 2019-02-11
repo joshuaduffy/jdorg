@@ -1,6 +1,6 @@
 from os import environ, remove
 from invoke import task
-from .commands import docker_compose, docker, aws
+from .commands import aws, docker
 from .util import chdir
 
 WORKING_DIR = 'monitoring'
