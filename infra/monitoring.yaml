@@ -109,7 +109,7 @@ Resources:
         -
           Name: Grafana
           Essential: true
-          Image: !GetAtt GrafanaEcr.ARN
+          Image: !GetAtt GrafanaEcr.Arn
           LogConfiguration:
             LogDriver: awslogs
             Options:
