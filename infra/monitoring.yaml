@@ -19,6 +19,26 @@ Conditions:
 
 Resources:
 
+  GrafanaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for Grafana
+      VpcId: !ImportValue VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          CidrIp: '0.0.0.0/0'
+          FromPort: 443
+          ToPort: 443
+        - IpProtocol: tcp
+          CidrIp: '0.0.0.0/0'
+          FromPort: 80
+          ToPort: 80
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          CidrIp: '0.0.0.0/0'
+          FromPort: 0
+          ToPort: 65535
+
   GrafanaECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
@@ -130,6 +150,7 @@ Resources:
           Key: idle_timeout.timeout_seconds
           Value: '30'
       Subnets: !Split [",", !ImportValue PublicSubnets]
+      SecurityGroups: [!Ref 'GrafanaSecurityGroup']
 
   GrafanaWithHttpsALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -223,6 +244,8 @@ Resources:
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref 'GrafanaSecurityGroup'
           Subnets: !Split [",", !ImportValue PrivateSubnets]
       TaskDefinition: !Ref GrafanaTaskDefinition
 
@@ -242,6 +265,8 @@ Resources:
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref 'GrafanaSecurityGroup'
           Subnets: !Split [",", !ImportValue PrivateSubnets]
       TaskDefinition: !Ref GrafanaTaskDefinition
 
