@@ -79,7 +79,7 @@ def update_cert(c, stack_name, domain_name, profile, create=False):
     "cert-arn": "A valid certificate ARN.",
     "profile": "A valid AWS profile."
 })
-def update_client(c, stack_name, subdomain, cert_arn, profile, create=False):
+def update_client(c, stack_name, subdomain, profile, cert_arn=None, create=False):
     """Create or update client/static site CloudFormation stack"""
     action = 'create' if create else 'update'
 
@@ -89,7 +89,7 @@ def update_client(c, stack_name, subdomain, cert_arn, profile, create=False):
             '--template-body', f'file://static-site.yaml',
             '--parameters',
             f'ParameterKey=Subdomain,ParameterValue={subdomain}',
-            f'ParameterKey=CertificateArn,ParameterValue={cert_arn}',
+            f'ParameterKey=CertificateArn,ParameterValue={cert_arn if cert_arn else ""}',
             f'--profile', f'{profile}')
 
 
@@ -99,7 +99,7 @@ def update_client(c, stack_name, subdomain, cert_arn, profile, create=False):
     "cert-arn": "A valid certificate ARN.",
     "profile": "A valid AWS profile."
 })
-def update_tld_redirect(c, stack_name, fqdn, cert_arn, profile, create=False):
+def update_tld_redirect(c, stack_name, fqdn, profile, cert_arn=None, create=False):
     """Create or update TLD redirect CloudFormation stack"""
     action = 'create' if create else 'update'
 
@@ -109,7 +109,7 @@ def update_tld_redirect(c, stack_name, fqdn, cert_arn, profile, create=False):
             '--template-body', f'file://top-level-domain.yaml',
             '--parameters',
             f'ParameterKey=FullyQualifiedDomainName,ParameterValue={fqdn}',
-            f'ParameterKey=CertificateArn,ParameterValue={cert_arn}',
+            f'ParameterKey=CertificateArn,ParameterValue={cert_arn if cert_arn else ""}',
             f'--profile', f'{profile}')
 
 
@@ -134,7 +134,7 @@ def update_vpc(c, stack_name, profile, create=False):
     "cert-arn": "A valid certificate ARN.",
     "profile": "A valid AWS profile."
 })
-def update_monitoring(c, stack_name, subdomain, cert_arn, profile, create=False):
+def update_monitoring(c, stack_name, subdomain, profile, cert_arn=None, create=False):
     """Create or update monitoring CloudFormation stack"""
     action = 'create' if create else 'update'
 
@@ -145,5 +145,5 @@ def update_monitoring(c, stack_name, subdomain, cert_arn, profile, create=False)
             '--capabilities', 'CAPABILITY_NAMED_IAM',
             '--parameters',
             f'ParameterKey=Subdomain,ParameterValue={subdomain}',
-            f'ParameterKey=CertificateArn,ParameterValue={cert_arn}',
+            f'ParameterKey=CertificateArn,ParameterValue={cert_arn if cert_arn else ""}',
             f'--profile', f'{profile}')
