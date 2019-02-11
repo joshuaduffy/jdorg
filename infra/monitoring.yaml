@@ -70,6 +70,23 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-ecr"]]
+      RepositoryPolicyText:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:aws:iam::${AWS::AccountId}:user/*"
+            Action:
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
 
   GrafanaLogGroup:
     Type: AWS::Logs::LogGroup
@@ -92,7 +109,7 @@ Resources:
         -
           Name: Grafana
           Essential: true
-          Image: !Ref GrafanaEcr
+          Image: !GetAtt GrafanaEcr.ARN
           LogConfiguration:
             LogDriver: awslogs
             Options:
