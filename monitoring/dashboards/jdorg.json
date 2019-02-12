@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1549977325095,
+  "iteration": 1549980569245,
   "links": [],
   "panels": [
     {
@@ -554,6 +554,44 @@
           "namespace": "AWS/Billing",
           "period": "",
           "refId": "H",
+          "region": "us-east-1",
+          "returnData": false,
+          "statistics": [
+            "Average"
+          ]
+        },
+        {
+          "alias": "KMS",
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "awskms"
+          },
+          "expression": "",
+          "highResolution": false,
+          "id": "",
+          "metricName": "EstimatedCharges",
+          "namespace": "AWS/Billing",
+          "period": "",
+          "refId": "I",
+          "region": "us-east-1",
+          "returnData": false,
+          "statistics": [
+            "Average"
+          ]
+        },
+        {
+          "alias": "SNS",
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonSNS"
+          },
+          "expression": "",
+          "highResolution": false,
+          "id": "",
+          "metricName": "EstimatedCharges",
+          "namespace": "AWS/Billing",
+          "period": "",
+          "refId": "J",
           "region": "us-east-1",
           "returnData": false,
           "statistics": [
