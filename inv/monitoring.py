@@ -21,10 +21,7 @@ def up(c, access_key=None, secret_key=None):
                 pass
 
             __create_credentials_file(access_key, secret_key)
-            __update_auth_type(
-                authType='credentials',
-                defaultRegion='eu-west-1'
-            )
+            __update_auth_type(authType='credentials', defaultRegion='eu-west-1')
 
         docker('build', '-t', 'grafana', '.')
         docker('run', '-p', '3000:3000', 'grafana')
@@ -41,11 +38,7 @@ def push(c, profile, aws_account_id='380760145297', aws_region='eu-west-1', ecr_
         with open('credentials', 'w') as creds:
             creds.write('\n')
 
-        __update_auth_type(
-            authType='arn',
-            assumeRoleArn=f'arn:aws:iam::{aws_account_id}:role/joshuaduffy-graf-exec-rol',
-            defaultRegion='eu-west-1'
-        )
+        __update_auth_type(defaultRegion='eu-west-1')
 
         docker('build', '-t', f'{aws_account_id}.dkr.ecr.{aws_region}.amazonaws.com/{ecr_repo_name}:{tag}', '.')
         docker('push', f'{aws_account_id}.dkr.ecr.{aws_region}.amazonaws.com/{ecr_repo_name}:{tag}')

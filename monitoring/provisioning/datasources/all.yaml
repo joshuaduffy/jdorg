@@ -1,11 +1,9 @@
 apiVersion: 1
 datasources:
-- access: direct
+- access: proxy
   editable: false
   isDefault: true
   jsonData:
-    assumeRoleArn: arn:aws:iam::380760145297:role/joshuaduffy-graf-exec-rol
-    authType: arn
     defaultRegion: eu-west-1
   name: CloudWatch
   orgId: 1
