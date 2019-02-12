@@ -29,7 +29,7 @@ def update_dns(c, stack_name, domain_name, profile, create=False):
 
     with chdir(WORKING_DIR):
         aws('cloudformation', f'{action}-stack',
-            '--stack-name' f'{stack_name}-dns',
+            '--stack-name', f'{stack_name}-dns',
             '--template-body', f'file://zone.yaml',
             '--parameters',
             f'ParameterKey=DomainName,ParameterValue={domain_name}',
@@ -70,7 +70,7 @@ def update_cert(c, stack_name, domain_name, profile, create=False):
             '--parameters',
             f'ParameterKey=DomainName,ParameterValue={domain_name}',
             f'--profile', f'{profile}',
-            '--region us-east-1')
+            '--region', 'us-east-1')
 
 
 @task(help={

@@ -131,31 +131,3 @@ Resources:
         AliasTarget:
           HostedZoneId: Z2FDTNDATAQYW2
           DNSName: !GetAtt [WebsiteWithoutHttpsCloudFront, DomainName]
-
-Outputs:
-
-  BucketName:
-    Value: !Ref 'WebsiteBucket'
-    Description: S3 Bucket Name
-    Export:
-      Name: BucketName
-
-  WebsiteWithHttpsCloudFrontEndpoint:
-    Condition: HttpsEnabled
-    Value: !GetAtt [WebsiteWithHttpsCloudFront, DomainName]
-    Description: CloudFront distribution endpoint
-    Export:
-      Name: CloudFrontEndpoint
-
-  WebsiteWithoutHttpsCloudFrontEndpoint:
-    Condition: HttpsDisabled
-    Value: !GetAtt [WebsiteWithoutHttpsCloudFront, DomainName]
-    Description: CloudFront distribution endpoint
-    Export:
-      Name: CloudFrontEndpoint
-
-  FullDomain:
-    Value: !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
-    Description: FQDN
-    Export:
-      Name: FullDomain
