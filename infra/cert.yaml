@@ -16,4 +16,6 @@ Resources:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Join [".", ["*", !Ref DomainName]]
+      SubjectAlternativeNames:
+        - !Ref DomainName
       ValidationMethod: DNS
