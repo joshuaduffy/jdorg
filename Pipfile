@@ -10,6 +10,7 @@ pylint = "*"
 rope = "*"
 ptvsd = "*"
 colorama = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.6"
