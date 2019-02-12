@@ -19,10 +19,10 @@ Conditions:
 
 Resources:
 
-  GrafanaSecurityGroup:
+  ExternalGrafanaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security Group for Grafana
+      GroupDescription: External Security Group for Grafana
       VpcId: !ImportValue VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -33,6 +33,22 @@ Resources:
           CidrIp: '0.0.0.0/0'
           FromPort: 80
           ToPort: 80
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          CidrIp: '0.0.0.0/0'
+          FromPort: 0
+          ToPort: 65535
+
+  InternalGrafanaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Internal Security Group for Grafana
+      VpcId: !ImportValue VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          SourceSecurityGroupId: !Ref ExternalGrafanaSecurityGroup
+          FromPort: 0
+          ToPort: 65535
       SecurityGroupEgress:
         - IpProtocol: tcp
           CidrIp: '0.0.0.0/0'
@@ -150,7 +166,8 @@ Resources:
           Key: idle_timeout.timeout_seconds
           Value: '30'
       Subnets: !Split [",", !ImportValue PublicSubnets]
-      SecurityGroups: [!Ref 'GrafanaSecurityGroup']
+      SecurityGroups:
+        - !Ref ExternalGrafanaSecurityGroup
 
   GrafanaWithHttpsALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -245,7 +262,7 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
           SecurityGroups:
-            - !Ref 'GrafanaSecurityGroup'
+            - !Ref InternalGrafanaSecurityGroup
           Subnets: !Split [",", !ImportValue PrivateSubnets]
       TaskDefinition: !Ref GrafanaTaskDefinition
 
@@ -266,7 +283,7 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
           SecurityGroups:
-            - !Ref 'GrafanaSecurityGroup'
+            - !Ref InternalGrafanaSecurityGroup
           Subnets: !Split [",", !ImportValue PrivateSubnets]
       TaskDefinition: !Ref GrafanaTaskDefinition
 
