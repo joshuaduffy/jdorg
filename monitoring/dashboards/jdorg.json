@@ -12,11 +12,10 @@
       }
     ]
   },
-  "editable": false,
+  "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
-  "iteration": 1546613400205,
+  "iteration": 1549977325095,
   "links": [],
   "panels": [
     {
@@ -84,6 +83,7 @@
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Requests (for selected distribution)",
       "tooltip": {
@@ -208,6 +208,7 @@
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Error Rate (for selected distribution)",
       "tooltip": {
@@ -330,6 +331,7 @@
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Bytes Transferred (for selected distribution)",
       "tooltip": {
@@ -538,10 +540,30 @@
           "statistics": [
             "Average"
           ]
+        },
+        {
+          "alias": "VPC",
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonVPC"
+          },
+          "expression": "",
+          "highResolution": false,
+          "id": "",
+          "metricName": "EstimatedCharges",
+          "namespace": "AWS/Billing",
+          "period": "",
+          "refId": "H",
+          "region": "us-east-1",
+          "returnData": false,
+          "statistics": [
+            "Average"
+          ]
         }
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Estimated Bill",
       "tooltip": {
@@ -598,6 +620,7 @@
           "value": "EMYJ27235M4Z"
         },
         "datasource": "CloudWatch",
+        "definition": "",
         "hide": 0,
         "includeAll": false,
         "label": "DistributionId",
