@@ -27,6 +27,8 @@ Resources:
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: 404.html
+      MetricsConfigurations:
+        - Id: EntireBucket
     DeletionPolicy: Retain
 
   WebsiteBucketPolicy:

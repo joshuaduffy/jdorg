@@ -1,0 +1,307 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: ECS cluster and ALB for Grafana
+
+Parameters:
+
+  Subdomain:
+    Type: String
+    Description: The subdomain to use e.g. dev, test, prod
+
+  CertificateArn:
+    Type: String
+    Description: ARN of the certificate in ACM
+
+Conditions:
+
+  HttpsEnabled: !Not [!Equals [!Ref CertificateArn, ""]]
+  HttpsDisabled: !Equals [!Ref CertificateArn, ""]
+
+Resources:
+
+  ExternalGrafanaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: External Security Group for Grafana
+      VpcId: !ImportValue VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          CidrIp: '0.0.0.0/0'
+          FromPort: 443
+          ToPort: 443
+        - IpProtocol: tcp
+          CidrIp: '0.0.0.0/0'
+          FromPort: 80
+          ToPort: 80
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          CidrIp: '0.0.0.0/0'
+          FromPort: 0
+          ToPort: 65535
+
+  InternalGrafanaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Internal Security Group for Grafana
+      VpcId: !ImportValue VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          SourceSecurityGroupId: !Ref ExternalGrafanaSecurityGroup
+          FromPort: 0
+          ToPort: 65535
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          CidrIp: '0.0.0.0/0'
+          FromPort: 0
+          ToPort: 65535
+
+  GrafanaECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-ecs-clust"]]
+
+  GrafanaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-exec-rol"]]
+      AssumeRolePolicyDocument:
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+
+  GrafanaTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-rol"]]
+      AssumeRolePolicyDocument:
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        -
+          PolicyName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-pol"]]
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - 'cloudwatch:GetMetricStatistics'
+                  - 'cloudwatch:ListMetrics'
+                Resource: '*'
+
+  GrafanaEcr:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-ecr"]]
+      RepositoryPolicyText:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action:
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
+
+  GrafanaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-log"]]
+      RetentionInDays: 60
+
+  GrafanaTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-td"]]
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '1024'
+      Memory: '2048'
+      ExecutionRoleArn: !Ref GrafanaExecutionRole
+      TaskRoleArn: !Ref GrafanaTaskRole
+      ContainerDefinitions:
+        -
+          Name: Grafana
+          Essential: true
+          Image: !Join [ ".", [ !Ref "AWS::AccountId", "dkr.ecr", !Ref "AWS::Region", !Join [ "/", [ "amazonaws.com", !Ref GrafanaEcr ] ] ] ]
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref GrafanaLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: Grafana
+          PortMappings:
+            -
+              ContainerPort: 3000
+
+  GrafanaALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-alb"]]
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        -
+          Key: idle_timeout.timeout_seconds
+          Value: '30'
+      Subnets: !Split [",", !ImportValue PublicSubnets]
+      SecurityGroups:
+        - !Ref ExternalGrafanaSecurityGroup
+
+  GrafanaWithHttpsALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HttpsEnabled
+    Properties:
+      DefaultActions:
+        -
+          Type: forward
+          TargetGroupArn: !Ref GrafanaALBTargetGroup
+      LoadBalancerArn: !Ref GrafanaALB
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01
+      Certificates:
+        -
+          CertificateArn: !Ref CertificateArn
+
+  GrafanaWithHttpsALBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: HttpsEnabled
+    Properties:
+      Actions:
+        -
+          Type: forward
+          TargetGroupArn: !Ref GrafanaALBTargetGroup
+      Conditions:
+        -
+          Field: path-pattern
+          Values:
+            - /
+      ListenerArn: !Ref GrafanaWithHttpsALBListener
+      Priority: 1
+
+  GrafanaWithoutHttpsALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HttpsDisabled
+    Properties:
+      DefaultActions:
+        -
+          Type: forward
+          TargetGroupArn: !Ref GrafanaALBTargetGroup
+      LoadBalancerArn: !Ref GrafanaALB
+      Port: 80
+      Protocol: HTTP
+
+  GrafanaWithoutHttpsALBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: HttpsDisabled
+    Properties:
+      Actions:
+        -
+          Type: forward
+          TargetGroupArn: !Ref GrafanaALBTargetGroup
+      Conditions:
+        -
+          Field: path-pattern
+          Values:
+            - /
+      ListenerArn: !Ref GrafanaWithoutHttpsALBListener
+      Priority: 1
+
+  GrafanaALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: GrafanaALB
+    Properties:
+      Name: !Join [ "-", [!Select [0, !Split [".", !ImportValue DomainName]], "graf-alb-tg"]]
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /api/health
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      UnhealthyThresholdCount: 2
+      VpcId: !ImportValue VpcId
+
+  GrafanaWithHttpsService:
+    Type: AWS::ECS::Service
+    Condition: HttpsEnabled
+    DependsOn: GrafanaWithHttpsALBListener
+    Properties:
+      Cluster: !Ref GrafanaECSCluster
+      LaunchType: FARGATE
+      DesiredCount: 1
+      LoadBalancers:
+        -
+          ContainerName: Grafana
+          ContainerPort: 3000
+          TargetGroupArn: !Ref GrafanaALBTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref InternalGrafanaSecurityGroup
+          Subnets: !Split [",", !ImportValue PrivateSubnets]
+      TaskDefinition: !Ref GrafanaTaskDefinition
+
+  GrafanaWithoutHttpsService:
+    Type: AWS::ECS::Service
+    Condition: HttpsDisabled
+    DependsOn: GrafanaWithoutHttpsALBListener
+    Properties:
+      Cluster: !Ref GrafanaECSCluster
+      LaunchType: FARGATE
+      DesiredCount: 1
+      LoadBalancers:
+        -
+          ContainerName: Grafana
+          ContainerPort: 3000
+          TargetGroupArn: !Ref GrafanaALBTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref InternalGrafanaSecurityGroup
+          Subnets: !Split [",", !ImportValue PrivateSubnets]
+      TaskDefinition: !Ref GrafanaTaskDefinition
+
+  GrafanaDNSName:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: !Join ['', [!ImportValue DomainName, .]]
+      RecordSets:
+      - Name: !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
+        Type: A
+        AliasTarget:
+          HostedZoneId: !GetAtt GrafanaALB.CanonicalHostedZoneID
+          DNSName: !GetAtt GrafanaALB.DNSName
+
+Outputs:
+
+  GrafanaFullDomain:
+    Value: !Join [".", [!Ref Subdomain, !ImportValue DomainName]]
+    Description: Grafana FQDN
+    Export:
+      Name: GrafanaFullDomain

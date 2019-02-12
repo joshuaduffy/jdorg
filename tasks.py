@@ -1,5 +1,5 @@
 from invoke import Collection
-from task import cf, client
+from inv import cf, client, monitoring
 
 # https://code.visualstudio.com/docs/python/debugging#_attach-to-a-local-script
 # import ptvsd
@@ -8,4 +8,4 @@ from task import cf, client
 # ptvsd.wait_for_attach()
 # breakpoint()
 
-ns = Collection(cf, client)
+ns = Collection(cf, client, monitoring)

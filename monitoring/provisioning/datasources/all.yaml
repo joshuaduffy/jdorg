@@ -1,0 +1,13 @@
+apiVersion: 1
+datasources:
+- access: proxy
+  editable: false
+  isDefault: true
+  jsonData:
+    defaultRegion: eu-west-1
+  name: CloudWatch
+  orgId: 1
+  type: cloudwatch
+deleteDatasources:
+- name: CloudWatch
+  orgId: 1
