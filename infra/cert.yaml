@@ -17,11 +17,3 @@ Resources:
     Properties:
       DomainName: !Join [".", ["*", !Ref DomainName]]
       ValidationMethod: DNS
-
-Outputs:
-
-  AcmCertificateArn:
-    Description: ARN of the Certificate
-    Value: !Ref WebsiteWildcardCertificate
-    Export:
-      Name: AcmCertificateArn

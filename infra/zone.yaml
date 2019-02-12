@@ -29,9 +29,3 @@ Outputs:
     Description: DomainName
     Export:
       Name: DomainName
-
-  NameServers:
-    Description: Name Servers
-    Value: !Join [". ", !GetAtt DNS.NameServers]
-    Export:
-      Name: NameServers
