@@ -13,6 +13,13 @@ def install(c):
         yarn('audit')
 
 
+@task
+def upgrade(c):
+    """Upgrade all the client's dependencies."""
+    with chdir(WORKING_DIR):
+        yarn('upgrade', '--latest')
+
+
 @task(install)
 def start(c):
     """Start the client in development mode, with hot reloading."""
