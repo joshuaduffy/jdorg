@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: VPC with 6 subnets (1 public and 1 private per AZ) and required routing
+Description: VPC with 4 subnets (1 public and 1 private over 2 AZ's) and required routing
 
 Resources:
 
@@ -37,14 +37,6 @@ Resources:
       CidrBlock: 172.1.11.0/24
       MapPublicIpOnLaunch: true
 
-  PublicSubnetC:
-    Type: AWS::EC2::Subnet
-    Properties:
-      AvailabilityZone: !Select [ 2, !GetAZs '' ]
-      VpcId: !Ref VPC
-      CidrBlock: 172.1.12.0/24
-      MapPublicIpOnLaunch: true
-
   PrivateSubnetA:
     Type: AWS::EC2::Subnet
     Properties:
@@ -59,14 +51,6 @@ Resources:
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       VpcId: !Ref VPC
       CidrBlock: 172.1.21.0/24
-      MapPublicIpOnLaunch: false
-
-  PrivateSubnetC:
-    Type: AWS::EC2::Subnet
-    Properties:
-      AvailabilityZone: !Select [ 2, !GetAZs '' ]
-      VpcId: !Ref VPC
-      CidrBlock: 172.1.22.0/24
       MapPublicIpOnLaunch: false
 
   NatGatewayAEIP:
@@ -93,18 +77,6 @@ Resources:
       AllocationId: !GetAtt NatGatewayBEIP.AllocationId
       SubnetId: !Ref PublicSubnetB
 
-  NatGatewayCEIP:
-    Type: AWS::EC2::EIP
-    DependsOn: VPCGatewayAttachment
-    Properties:
-      Domain: vpc
-
-  NatGatewayC:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt NatGatewayCEIP.AllocationId
-      SubnetId: !Ref PublicSubnetC
-
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -129,12 +101,6 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnetB
-
-  PublicSubnetCRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref PublicSubnetC
 
   PrivateRouteTableA:
     Type: AWS::EC2::RouteTable
@@ -172,24 +138,6 @@ Resources:
       RouteTableId: !Ref PrivateRouteTableB
       SubnetId: !Ref PrivateSubnetB
 
-  PrivateRouteTableC:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-
-  DefaultPrivateRouteC:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PrivateRouteTableC
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NatGatewayC
-
-  PrivateSubnetCRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRouteTableC
-      SubnetId: !Ref PrivateSubnetC
-
 Outputs:
 
   VpcId:
@@ -200,12 +148,12 @@ Outputs:
 
   PublicSubnets:
     Description: Public subnets
-    Value: !Join [ ",", [ !Ref PublicSubnetA, !Ref PublicSubnetB, !Ref PublicSubnetC ]]
+    Value: !Join [ ",", [ !Ref PublicSubnetA, !Ref PublicSubnetB]]
     Export:
       Name: PublicSubnets
 
   PrivateSubnets:
     Description: Private subnets
-    Value: !Join [ ",", [ !Ref PrivateSubnetA, !Ref PrivateSubnetB, !Ref PrivateSubnetC ]]
+    Value: !Join [ ",", [ !Ref PrivateSubnetA, !Ref PrivateSubnetB]]
     Export:
       Name: PrivateSubnets
