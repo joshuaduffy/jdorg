@@ -1,6 +1,6 @@
 from os import listdir
 from invoke import task
-from .commands import yarn, aws
+from .commands import aws
 from .util import chdir
 
 WORKING_DIR = 'infra'

@@ -10,7 +10,7 @@ def install(c):
     """Install all the client's dependencies."""
     with chdir(WORKING_DIR):
         yarn('install')
-        yarn('audit')
+        #yarn('audit')
 
 
 @task
