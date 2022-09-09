@@ -1,5 +1,9 @@
+from colorama import init
 from invoke import Collection
-from inv import cf, client, monitoring
+
+from tasks import cf, client, monitoring
+
+init()
 
 # https://code.visualstudio.com/docs/python/debugging#_attach-to-a-local-script
 # import ptvsd
