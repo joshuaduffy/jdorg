@@ -19,27 +19,27 @@
     "develop": {
         "astroid": {
             "hashes": [
-                "sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56",
-                "sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918"
+                "sha256:81f870105d892e73bf535da77a8261aa5bde838fa4ed12bb2f435291a098c581",
+                "sha256:997e0c735df60d4a4caff27080a3afc51f9bdd693d3572a4a0b7090b645c36c5"
             ],
             "markers": "python_full_version >= '3.7.2'",
-            "version": "==2.12.9"
+            "version": "==2.12.10"
         },
         "awscli": {
             "hashes": [
-                "sha256:a3697e16ddf41979bdc62f5665f29e86413ecd5df39bc65e5b4c5cf7b4a10961",
-                "sha256:edb64c9f61ffafdd72e03a28d82d5eff970ebe48d80980c7d92b05a41aee424f"
+                "sha256:0e664aa01cbbf9d061c9df2776588fbce96e7ade2e84febe3a11ee6095cda554",
+                "sha256:3d2af4cd91065c5c5c15237b410e54c74678682c309bd9dafb6848bff811ebeb"
             ],
             "index": "pypi",
-            "version": "==1.25.70"
+            "version": "==1.25.76"
         },
         "botocore": {
             "hashes": [
-                "sha256:49650a8ed97d614e6ab39c6cbbcaff0f7b524c2761d81b9cf7c3830afee244fc",
-                "sha256:f396a14b0ddded14b84b401c7d1bb510d0ea43540175f7183eb93358df4608a5"
+                "sha256:a6229f9b31f7fe372475c0ee60483b3ec827e4b76275d5239fbfd590cd0b217f",
+                "sha256:f8b1da2b41e88c58db51db0c6eff6ca564258948ce4a5ac7e96ac35a469b0d4f"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==1.27.69"
+            "version": "==1.27.75"
         },
         "colorama": {
             "hashes": [
