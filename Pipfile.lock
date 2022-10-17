@@ -19,27 +19,27 @@
     "develop": {
         "astroid": {
             "hashes": [
-                "sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56",
-                "sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918"
+                "sha256:2df4f9980c4511474687895cbfdb8558293c1a826d9118bb09233d7c2bff1c83",
+                "sha256:867a756bbf35b7bc07b35bfa6522acd01f91ad9919df675e8428072869792dce"
             ],
             "markers": "python_full_version >= '3.7.2'",
-            "version": "==2.12.9"
+            "version": "==2.12.11"
         },
         "awscli": {
             "hashes": [
-                "sha256:a3697e16ddf41979bdc62f5665f29e86413ecd5df39bc65e5b4c5cf7b4a10961",
-                "sha256:edb64c9f61ffafdd72e03a28d82d5eff970ebe48d80980c7d92b05a41aee424f"
+                "sha256:49165e0a9259ff719b5f086de9feaacdbdd96921c547c51d9c1f00f066b9dc5d",
+                "sha256:d8ebfee43142bd691108a771be7e6973fcc3d344645ee42b3c7270a427e2957c"
             ],
             "index": "pypi",
-            "version": "==1.25.70"
+            "version": "==1.25.92"
         },
         "botocore": {
             "hashes": [
-                "sha256:49650a8ed97d614e6ab39c6cbbcaff0f7b524c2761d81b9cf7c3830afee244fc",
-                "sha256:f396a14b0ddded14b84b401c7d1bb510d0ea43540175f7183eb93358df4608a5"
+                "sha256:1d6e97bd8653f732c7078b34aa2bb438e750898957e5a0a74b6c72918bc1d0f7",
+                "sha256:c8fac203a391cc2e4b682877bfce70e723e33c529b35b399a1d574605fbeb1af"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==1.27.69"
+            "version": "==1.27.91"
         },
         "colorama": {
             "hashes": [
@@ -314,11 +314,11 @@
         },
         "tomlkit": {
             "hashes": [
-                "sha256:25d4e2e446c453be6360c67ddfb88838cfc42026322770ba13d1fbd403a93a5c",
-                "sha256:3235a9010fae54323e727c3ac06fb720752fe6635b3426e379daec60fbd44a83"
+                "sha256:571854ebbb5eac89abcb4a2e47d7ea27b89bf29e09c35395da6f03dd4ae23d1c",
+                "sha256:f2ef9da9cef846ee027947dc99a45d6b68a63b0ebc21944649505bf2e8bc5fe7"
             ],
             "markers": "python_version >= '3.6' and python_version < '4'",
-            "version": "==0.11.4"
+            "version": "==0.11.5"
         },
         "urllib3": {
             "hashes": [
