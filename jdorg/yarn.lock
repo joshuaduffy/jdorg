@@ -2120,14 +2120,14 @@
   dependencies:
     "@typescript-eslint/utils" "5.36.2"
 
-"@typescript-eslint/parser@^5.36.2", "@typescript-eslint/parser@^5.5.0":
-  version "5.36.2"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.36.2.tgz#3ddf323d3ac85a25295a55fcb9c7a49ab4680ddd"
-  integrity sha512-qS/Kb0yzy8sR0idFspI9Z6+t7mqk/oRjnAYfewG+VN73opAUvmYL3oPIMmgOX6CnQS6gmVIXGshlb5RY/R22pA==
+"@typescript-eslint/parser@^5.5.0", "@typescript-eslint/parser@^5.52.0":
+  version "5.52.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.52.0.tgz#73c136df6c0133f1d7870de7131ccf356f5be5a4"
+  integrity sha512-e2KiLQOZRo4Y0D/b+3y08i3jsekoSkOYStROYmPUnGMEoA0h+k2qOH5H6tcjIc68WDvGwH+PaOrP1XRzLJ6QlA==
   dependencies:
-    "@typescript-eslint/scope-manager" "5.36.2"
-    "@typescript-eslint/types" "5.36.2"
-    "@typescript-eslint/typescript-estree" "5.36.2"
+    "@typescript-eslint/scope-manager" "5.52.0"
+    "@typescript-eslint/types" "5.52.0"
+    "@typescript-eslint/typescript-estree" "5.52.0"
     debug "^4.3.4"
 
 "@typescript-eslint/scope-manager@5.36.2":
@@ -2145,6 +2145,14 @@
   dependencies:
     "@typescript-eslint/types" "5.41.0"
     "@typescript-eslint/visitor-keys" "5.41.0"
+
+"@typescript-eslint/scope-manager@5.52.0":
+  version "5.52.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/scope-manager/-/scope-manager-5.52.0.tgz#a993d89a0556ea16811db48eabd7c5b72dcb83d1"
+  integrity sha512-AR7sxxfBKiNV0FWBSARxM8DmNxrwgnYMPwmpkC1Pl1n+eT8/I2NAUPuwDy/FmDcC6F8pBfmOcaxcxRHspgOBMw==
+  dependencies:
+    "@typescript-eslint/types" "5.52.0"
+    "@typescript-eslint/visitor-keys" "5.52.0"
 
 "@typescript-eslint/type-utils@5.41.0":
   version "5.41.0"
@@ -2166,6 +2174,11 @@
   resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-5.41.0.tgz#6800abebc4e6abaf24cdf220fb4ce28f4ab09a85"
   integrity sha512-5BejraMXMC+2UjefDvrH0Fo/eLwZRV6859SXRg+FgbhA0R0l6lDqDGAQYhKbXhPN2ofk2kY5sgGyLNL907UXpA==
 
+"@typescript-eslint/types@5.52.0":
+  version "5.52.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-5.52.0.tgz#19e9abc6afb5bd37a1a9bea877a1a836c0b3241b"
+  integrity sha512-oV7XU4CHYfBhk78fS7tkum+/Dpgsfi91IIDy7fjCyq2k6KB63M6gMC0YIvy+iABzmXThCRI6xpCEyVObBdWSDQ==
+
 "@typescript-eslint/typescript-estree@5.36.2":
   version "5.36.2"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-5.36.2.tgz#0c93418b36c53ba0bc34c61fe9405c4d1d8fe560"
@@ -2186,6 +2199,19 @@
   dependencies:
     "@typescript-eslint/types" "5.41.0"
     "@typescript-eslint/visitor-keys" "5.41.0"
+    debug "^4.3.4"
+    globby "^11.1.0"
+    is-glob "^4.0.3"
+    semver "^7.3.7"
+    tsutils "^3.21.0"
+
+"@typescript-eslint/typescript-estree@5.52.0":
+  version "5.52.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-5.52.0.tgz#6408cb3c2ccc01c03c278cb201cf07e73347dfca"
+  integrity sha512-WeWnjanyEwt6+fVrSR0MYgEpUAuROxuAH516WPjUblIrClzYJj0kBbjdnbQXLpgAN8qbEuGywiQsXUVDiAoEuQ==
+  dependencies:
+    "@typescript-eslint/types" "5.52.0"
+    "@typescript-eslint/visitor-keys" "5.52.0"
     debug "^4.3.4"
     globby "^11.1.0"
     is-glob "^4.0.3"
@@ -2232,6 +2258,14 @@
   integrity sha512-vilqeHj267v8uzzakbm13HkPMl7cbYpKVjgFWZPIOHIJHZtinvypUhJ5xBXfWYg4eFKqztbMMpOgFpT9Gfx4fw==
   dependencies:
     "@typescript-eslint/types" "5.41.0"
+    eslint-visitor-keys "^3.3.0"
+
+"@typescript-eslint/visitor-keys@5.52.0":
+  version "5.52.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/visitor-keys/-/visitor-keys-5.52.0.tgz#e38c971259f44f80cfe49d97dbffa38e3e75030f"
+  integrity sha512-qMwpw6SU5VHCPr99y274xhbm+PRViK/NATY6qzt+Et7+mThGuFSl/ompj2/hrBlRP/kq+BFdgagnOSgw9TB0eA==
+  dependencies:
+    "@typescript-eslint/types" "5.52.0"
     eslint-visitor-keys "^3.3.0"
 
 "@webassemblyjs/ast@1.11.1":
@@ -4620,11 +4654,6 @@ function.prototype.name@^1.1.5:
     define-properties "^1.1.3"
     es-abstract "^1.19.0"
     functions-have-names "^1.2.2"
-
-functional-red-black-tree@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
-  integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
 functions-have-names@^1.2.2:
   version "1.2.3"
