@@ -27,19 +27,19 @@
         },
         "awscli": {
             "hashes": [
-                "sha256:af4b6893d659af3109d90b9a645d271fb980e5b4ffd2755d7968eafd79b97590",
-                "sha256:c63311d99ae709e44c986d71503ca84221d8396856116609a8e9e1af755ccbbf"
+                "sha256:16eae4f4905c554eb8c89483e9ebab4985c76f9ff84569cba6c45458c130b7c2",
+                "sha256:a27a7d1f3efa9dd2acf9d8bd72b939337d53da4ac71721cde6d5dff94aa446f7"
             ],
             "index": "pypi",
-            "version": "==1.26.4"
+            "version": "==1.27.84"
         },
         "botocore": {
             "hashes": [
-                "sha256:09387978a75e7108aa15e8d67bfeb7938cce3d7043339c971daf4277dc4db804",
-                "sha256:ade670506c9e837f61d590873a11c5d06ab9a8492b8d5b853d6c4059ecddc03d"
+                "sha256:0f976427ad0a2602624ba784b5db328a865c2e9e0cc1bb6d8cffb6c0a2d177e1",
+                "sha256:a36f7f6f8eae5dbd4a1cc8cb6fc747f6315500541181eff2093ee0529fc8e4bc"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==1.28.4"
+            "version": "==1.29.84"
         },
         "colorama": {
             "hashes": [
