@@ -67,11 +67,11 @@
         },
         "invoke": {
             "hashes": [
-                "sha256:2dc975b4f92be0c0a174ad2d063010c8a1fdb5e9389d69871001118b4fcac4fb",
-                "sha256:7b6deaf585eee0a848205d0b8c0014b9bf6f287a8eb798818a642dff1df14b19"
+                "sha256:7ab5dd9cd76b787d560a78b1a9810d252367ab595985c50612702be21d671dd7",
+                "sha256:a860582bcf7a4b336fe18ef53937f0f28cec1c0053ffa767c2fcf7ba0b850f59"
             ],
             "index": "pypi",
-            "version": "==1.7.1"
+            "version": "==2.0.0"
         },
         "isort": {
             "hashes": [
